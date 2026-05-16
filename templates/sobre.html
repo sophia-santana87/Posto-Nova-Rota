@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nós - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body class="inner-page">
+    <nav class="page-nav">
+        <a class="brand dark" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+            <span class="brand-name">Nova Rota</span>
+        </a>
+        <div class="nav-links dark">
+            <a href="{{ url_for('servicos') }}">Serviços</a>
+            <a href="{{ url_for('esg') }}">ESG</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+        </div>
+        <div class="nav-actions">
+            <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+            <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+        </div>
+    </nav>
+
+    <main class="section page-section about-page">
+        <section class="about-hero-panel">
+            <p class="eyebrow">Sobre a Nova Rota</p>
+            <h1>Mais que um posto, uma operação pensada para facilitar o seu dia.</h1>
+            <p>Unimos abastecimento, serviços automotivos e tecnologia para entregar uma experiência mais prática, transparente e confiável para clientes, empresas e frotas.</p>
+        </section>
+
+        <section class="about-text-panel">
+            <p>Nosso posto nasceu com o propósito de oferecer mais do que abastecimento: proporcionamos confiança, praticidade e uma experiência positiva para cada cliente.</p>
+            <p>Tempo e economia fazem diferença, por isso unimos qualidade, atendimento acessível e preços justos.</p>
+            <p>Valorizamos nossa comunidade e trabalhamos para sermos referência em custo-benefício, transparência e excelência no serviço.</p>
+        </section>
+
+        <section class="about-pillars">
+            <article>
+                <span>Missão</span>
+                <p>Oferecer combustível e serviços de qualidade com atendimento rápido, humanizado e eficiente.</p>
+            </article>
+            <article>
+                <span>Visão</span>
+                <p>Ser reconhecido como uma referência regional em confiança, praticidade e soluções para empresas.</p>
+            </article>
+            <article>
+                <span>Valores</span>
+                <p>Qualidade, transparência, acessibilidade, inovação, sustentabilidade e respeito pelas pessoas.</p>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

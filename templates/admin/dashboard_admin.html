@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Administrador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="../../static/css/style.css">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
+            <nav class="side-nav">
+                <a class="active" href="#">Dashboard</a>
+                <a href="#">Clientes</a>
+                <a href="#">Boletos</a>
+                <a href="#">Serviços</a>
+                <a href="#">Pagamentos</a>
+                <a href="#">Relatórios</a>
+                <a href="#">Usuários</a>
+                <a href="#">Configurações</a>
+                <a href="{{ url_for('home') }}">Sair</a>
+            </nav>
+        </aside>
+        <main class="app-main">
+            <header class="topbar">
+                <h1>Dashboard - Administrador</h1>
+                <span>Bem-vindo, Admin</span>
+            </header>
+            <section class="dashboard">
+                <div class="metric-grid">
+                    <article class="metric-card"><small>Clientes Ativos</small><strong>128</strong><span>+12 este mês</span></article>
+                    <article class="metric-card"><small>Faturamento (mês)</small><strong>R$ 45.780,00</strong><span>+8% este mês</span></article>
+                    <article class="metric-card"><small>Boletos Pagos</small><strong>96</strong><span>+15 este mês</span></article>
+                    <article class="metric-card"><small>Boletos Atrasados</small><strong>32</strong><span>+5 este mês</span></article>
+                </div>
+                <div class="dashboard-grid">
+                    <article class="chart-card">
+                        <h2>Faturamento (últimos 6 meses)</h2>
+                        <div class="bars"><i style="height: 28%"></i><i style="height: 48%"></i><i style="height: 52%"></i><i style="height: 78%"></i><i style="height: 64%"></i><i style="height: 92%"></i></div>
+                    </article>
+                    <article class="chart-card">
+                        <h2>Boletos por Status</h2>
+                        <div class="donut"></div>
+                        <p>Pagos 75% • Em aberto 15% • Atrasados 10%</p>
+                    </article>
+                    <article class="chart-card">
+                        <h2>Serviços mais utilizados</h2>
+                        <div class="progress-list">
+                            <div class="progress-row"><span>Combustível</span><div class="track"><i style="width:65%"></i></div><strong>65%</strong></div>
+                            <div class="progress-row"><span>Lavagem</span><div class="track"><i style="width:15%"></i></div><strong>15%</strong></div>
+                            <div class="progress-row"><span>Estacionamento Rotativo</span><div class="track"><i style="width:10%"></i></div><strong>10%</strong></div>
+                            <div class="progress-row"><span>Estacionamento Mensal</span><div class="track"><i style="width:10%"></i></div><strong>10%</strong></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Cliente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="../../static/css/style.css">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body>
+    <main class="client-shell">
+        <aside class="sidebar client">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
+            <nav class="side-nav">
+                <a class="active" href="#">Início</a>
+                <a href="#">Meus Boletos</a>
+                <a href="#">Meus Serviços</a>
+                <a href="#">Meu Perfil</a>
+                <a href="{{ url_for('home') }}">Sair</a>
+            </nav>
+        </aside>
+        <section class="client-content">
+            <p><strong>Olá, Empresa Exemplo Ltda</strong><br><small>CNPJ: 00.000.000/0000-00</small></p>
+            <div class="alert">⚠ Atenção! Você possui 1 boleto em aberto com vencimento para 20/11/2026.</div>
+            <article class="content-panel">
+                <h1>Seus boletos</h1>
+                <table class="table">
+                    <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        <tr><td>20/11/2026</td><td>Serviços - Outubro/2026</td><td>R$ 1.250,00</td><td><span class="pill">Em aberto</span></td><td><a class="small-link" href="#">Ver boleto</a></td></tr>
+                        <tr><td>20/10/2026</td><td>Serviços - Setembro/2026</td><td>R$ 960,00</td><td>Pago</td><td></td></tr>
+                        <tr><td>20/09/2026</td><td>Serviços - Agosto/2026</td><td>R$ 1.100,00</td><td>Pago</td><td></td></tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

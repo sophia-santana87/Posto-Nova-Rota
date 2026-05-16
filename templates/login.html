@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body>
+    <main class="access-page">
+        <section class="access-card">
+            <div>
+                <h1>Acesse sua conta</h1>
+                <p>Selecione o tipo de acesso:</p>
+                <div class="access-options">
+                    <a class="access-option {{ 'active' if tipo == 'cliente' else '' }}" href="{{ url_for('login', tipo='cliente') }}">
+                        <span class="icon-badge green">●</span>
+                        <span><strong>Cliente</strong><br><small>Acesse sua área e consulte seus débitos e serviços.</small></span>
+                        <strong>›</strong>
+                    </a>
+                    <a class="access-option {{ 'active' if tipo == 'funcionario' else '' }}" href="{{ url_for('login', tipo='funcionario') }}">
+                        <span class="icon-badge blue">■</span>
+                        <span><strong>Funcionário</strong><br><small>Acesse o sistema interno da empresa.</small></span>
+                        <strong>›</strong>
+                    </a>
+                    <a class="access-option {{ 'active' if tipo == 'admin' else '' }}" href="{{ url_for('login', tipo='admin') }}">
+                        <span class="icon-badge purple">◆</span>
+                        <span><strong>Administrador</strong><br><small>Acesso restrito ao painel administrativo.</small></span>
+                        <strong>›</strong>
+                    </a>
+                </div>
+            </div>
+
+            <div class="access-divider"></div>
+
+            <form class="login-card" method="post">
+                <input type="hidden" name="tipo" value="{{ tipo }}">
+                <h2>Login - {{ 'Cliente' if tipo == 'cliente' else 'Funcionário' if tipo == 'funcionario' else 'Administrador' }}</h2>
+                <p>Entre com seu CNPJ e senha para acessar sua conta.</p>
+
+                <label class="form-field">
+                    <span>CNPJ</span>
+                    <input name="cnpj" inputmode="numeric" placeholder="00.000.000/0000-00" required>
+                </label>
+
+                <label class="form-field">
+                    <span>Senha</span>
+                    <input name="senha" type="password" placeholder="••••••••" required>
+                </label>
+
+                <a class="small-link" href="#">Esqueceu sua senha?</a>
+                <button class="btn green" type="submit">Entrar</button>
+                <p class="center-note">Não tem cadastro? <a href="{{ url_for('home') }}#contato">Fale conosco</a></p>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body class="inner-page">
+    <nav class="page-nav">
+        <a class="brand dark" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+            <span class="brand-name">Nova Rota</span>
+        </a>
+        <div class="nav-links dark">
+            <a href="{{ url_for('servicos') }}">Serviços</a>
+            <a href="{{ url_for('esg') }}">ESG</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+        </div>
+        <div class="nav-actions">
+            <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+            <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+        </div>
+    </nav>
+
+    <main class="section page-section contact-page">
+        <section class="contact-intro">
+            <p class="eyebrow">Fale com a equipe</p>
+            <h1>Como podemos ajudar?</h1>
+            <p>Envie sua solicitação para novos cadastros, dúvidas sobre boletos, atendimento empresarial ou suporte ao sistema RotaFácil.</p>
+        </section>
+
+        <section class="contact-layout">
+            <form class="contact-form" action="{{ url_for('contato') }}" method="post">
+                {% if enviado %}
+                <div class="form-success">
+                    <strong>Mensagem registrada com sucesso.</strong>
+                    <span>Obrigado, {{ contato_enviado.nome or 'cliente' }}. Sua solicitação foi salva para acompanhamento da equipe.</span>
+                </div>
+                {% endif %}
+                {% if erro_envio %}
+                <div class="form-error">
+                    <strong>Não foi possível registrar a mensagem.</strong>
+                    <span>Detalhe: {{ erro_envio }}</span>
+                </div>
+                {% endif %}
+
+                <div class="form-row">
+                    <label>
+                        <span>Nome</span>
+                        <input type="text" name="nome" placeholder="Seu nome completo" required>
+                    </label>
+                    <label>
+                        <span>E-mail</span>
+                        <input type="email" name="email" placeholder="voce@empresa.com" required>
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <label>
+                        <span>Telefone</span>
+                        <input type="tel" name="telefone" placeholder="(00) 00000-0000">
+                    </label>
+                    <label>
+                        <span>Assunto</span>
+                        <select name="assunto" required>
+                            <option value="">Selecione</option>
+                            <option>Cadastro empresarial</option>
+                            <option>Boletos e pagamentos</option>
+                            <option>Serviços automotivos</option>
+                            <option>Suporte ao sistema</option>
+                        </select>
+                    </label>
+                </div>
+
+                <label>
+                    <span>Mensagem</span>
+                    <textarea name="mensagem" rows="6" placeholder="Descreva sua solicitação" required></textarea>
+                </label>
+
+                <button class="btn primary" type="submit">Enviar mensagem</button>
+            </form>
+
+            <aside class="contact-side">
+                <h2>Atendimento Nova Rota</h2>
+                <p>Para empresas e clientes, nossa equipe acompanha solicitações com foco em agilidade, clareza e segurança.</p>
+                <div>
+                    <strong>Atendimento administrativo</strong>
+                    <span>Segunda a sexta, das 08h às 18h</span>
+                </div>
+                <div>
+                    <strong>Atendimento do posto</strong>
+                    <span>Todos os dias, das 06h às 22h</span>
+                </div>
+                <div>
+                    <strong>Suporte 24h</strong>
+                    <span>Disponível para área do cliente, boletos e solicitações urgentes</span>
+                </div>
+                <div>
+                    <strong>Área do Cliente</strong>
+                    <span>Consulte boletos e serviços pelo sistema</span>
+                </div>
+                <a class="btn back-service" href="{{ url_for('login') }}">Acessar sistema</a>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

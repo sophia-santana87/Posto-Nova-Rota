@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Posto Nova Rota</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body{
+            background:#f4f6fb;
+            color:#111827;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        /* NAVBAR */
+
+        nav{
+
+            width:100%;
+            height:90px;
+
+            background:#081120;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+
+            padding:0 5%;
+
+            position:fixed;
+            top:0;
+            z-index:999;
+
+        }
+
+        .logo{
+
+            display:flex;
+            align-items:center;
+            gap:15px;
+
+        }
+
+        .logo img{
+            width:65px;
+        }
+
+        .logo-text h1{
+            color:white;
+            font-size:28px;
+        }
+
+        .logo-text p{
+            color:#b8c3d1;
+            font-size:12px;
+        }
+
+        .menu{
+
+            display:flex;
+            gap:35px;
+
+        }
+
+        .menu a{
+
+            color:white;
+            text-decoration:none;
+            font-weight:500;
+            transition:0.3s;
+
+        }
+
+        .menu a:hover{
+            color:#2f7cff;
+        }
+
+        .buttons{
+            display:flex;
+            gap:15px;
+        }
+
+        .btn-login{
+
+            border:1px solid rgba(255,255,255,0.2);
+
+            padding:12px 25px;
+
+            border-radius:12px;
+
+            color:white;
+            text-decoration:none;
+
+            transition:0.3s;
+
+        }
+
+        .btn-login:hover{
+            background:white;
+            color:black;
+        }
+
+        .btn-area{
+
+            background:#2f7cff;
+
+            padding:12px 25px;
+
+            border-radius:12px;
+
+            color:white;
+            text-decoration:none;
+            font-weight:600;
+
+        }
+
+        /* HERO */
+
+        .hero{
+
+            width:100%;
+            min-height:100vh;
+
+            background:#081120;
+
+            padding-top:130px;
+            padding-left:5%;
+            padding-right:5%;
+            padding-bottom:80px;
+
+        }
+
+        .hero-container{
+
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:40px;
+
+            align-items:center;
+
+        }
+
+        .hero-text h1{
+
+            color:white;
+            font-size:70px;
+            line-height:1.1;
+
+            margin-bottom:25px;
+
+        }
+
+        .hero-text span{
+            color:#2f7cff;
+        }
+
+        .hero-text p{
+
+            color:#d4d9e1;
+
+            font-size:22px;
+            line-height:1.7;
+
+            margin-bottom:40px;
+
+        }
+
+        .hero-buttons{
+            display:flex;
+            gap:20px;
+        }
+
+        .btn-primary{
+
+            background:#2f7cff;
+
+            padding:16px 30px;
+
+            border-radius:12px;
+
+            color:white;
+            text-decoration:none;
+            font-weight:600;
+
+        }
+
+        .btn-secondary{
+
+            border:1px solid rgba(255,255,255,0.2);
+
+            padding:16px 30px;
+
+            border-radius:12px;
+
+            color:white;
+            text-decoration:none;
+
+        }
+
+        .hero-image img{
+
+            width:100%;
+            border-radius:25px;
+
+            box-shadow:0px 20px 40px rgba(0,0,0,0.4);
+
+        }
+
+        /* SOBRE */
+
+        .sobre{
+
+            padding:100px 5%;
+            background:white;
+
+        }
+
+        .titulo{
+
+            font-size:42px;
+            margin-bottom:50px;
+
+        }
+
+        .sobre-grid{
+
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:50px;
+
+            align-items:center;
+
+        }
+
+        .sobre-text p{
+
+            margin-bottom:25px;
+            line-height:1.9;
+
+            color:#4b5563;
+
+            font-size:18px;
+
+        }
+
+        .sobre-img img{
+
+            width:100%;
+            border-radius:25px;
+
+        }
+
+        /* MISSÃO VISÃO */
+
+        .mvv{
+
+            margin-top:60px;
+
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+
+            gap:25px;
+
+        }
+
+        .mvv-card{
+
+            background:#f7f9fc;
+
+            border:1px solid #dbe4f0;
+
+            padding:35px;
+
+            border-radius:20px;
+
+        }
+
+        .mvv-card h3{
+
+            color:#1d4ed8;
+
+            margin-bottom:20px;
+
+            font-size:25px;
+
+        }
+
+        .mvv-card p{
+
+            color:#4b5563;
+            line-height:1.8;
+
+        }
+
+        /* ESG */
+
+        .esg{
+
+            margin-top:80px;
+
+        }
+
+        .esg-grid{
+
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+            gap:25px;
+
+            margin-top:30px;
+
+        }
+
+        .esg-card{
+
+            background:#f7f9fc;
+
+            padding:30px;
+
+            border-radius:20px;
+
+            border:1px solid #dbe4f0;
+
+        }
+
+        .esg-card h3{
+
+            margin-bottom:15px;
+            color:#16a34a;
+
+        }
+
+        /* SERVIÇOS */
+
+        .servicos{
+
+            padding:100px 5%;
+
+            background:#f4f6fb;
+
+        }
+
+        .cards{
+
+            display:grid;
+
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+            gap:30px;
+
+        }
+
+        .card{
+
+            background:white;
+
+            border-radius:20px;
+
+            overflow:hidden;
+
+            text-decoration:none;
+
+            transition:0.3s;
+
+            box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
+        }
+
+        .card:hover{
+
+            transform:translateY(-10px);
+
+        }
+
+        .card img{
+
+            width:100%;
+            height:220px;
+
+            object-fit:cover;
+
+        }
+
+        .card-content{
+
+            padding:25px;
+
+        }
+
+        .card-content h3{
+
+            color:#081120;
+
+            margin-bottom:12px;
+
+            font-size:24px;
+
+        }
+
+        .card-content p{
+
+            color:#6b7280;
+            line-height:1.7;
+
+        }
+
+        /* LOGIN PREVIEW */
+
+        .login-preview{
+
+            padding:100px 5%;
+            background:white;
+
+        }
+
+        .login-box{
+
+            background:#f7f9fc;
+
+            border-radius:25px;
+
+            padding:50px;
+
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:50px;
+
+        }
+
+        .login-options{
+
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+
+        }
+
+        .option{
+
+            background:white;
+
+            padding:25px;
+
+            border-radius:18px;
+
+            border:1px solid #dbe4f0;
+
+            transition:0.3s;
+
+        }
+
+        .option:hover{
+
+            border:1px solid #2f7cff;
+
+        }
+
+        .option h3{
+
+            margin-bottom:10px;
+
+        }
+
+        .form-login{
+
+            background:white;
+
+            padding:40px;
+
+            border-radius:20px;
+
+            border:1px solid #dbe4f0;
+
+        }
+
+        .form-login h2{
+
+            margin-bottom:30px;
+
+        }
+
+        .form-login input{
+
+            width:100%;
+            padding:16px;
+
+            margin-bottom:20px;
+
+            border-radius:10px;
+
+            border:1px solid #d1d5db;
+
+        }
+
+        .form-login button{
+
+            width:100%;
+
+            padding:16px;
+
+            background:#16a34a;
+
+            border:none;
+
+            border-radius:10px;
+
+            color:white;
+
+            font-size:16px;
+            font-weight:600;
+
+            cursor:pointer;
+
+        }
+
+        /* FOOTER */
+
+        footer{
+
+            background:#081120;
+
+            padding:70px 5%;
+
+            color:white;
+
+        }
+
+        footer p{
+
+            margin-top:15px;
+            color:#c6d0dd;
+
+        }
+
+        /* RESPONSIVO */
+
+        @media(max-width:1000px){
+
+            .hero-container,
+            .sobre-grid,
+            .login-box{
+
+                grid-template-columns:1fr;
+
+            }
+
+            .hero-text h1{
+
+                font-size:50px;
+
+            }
+
+            nav{
+
+                flex-direction:column;
+                height:auto;
+
+                padding:25px;
+
+                gap:20px;
+
+            }
+
+            .menu{
+
+                flex-wrap:wrap;
+                justify-content:center;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+
+        <div class="logo">
+
+            <img src="{{ url_for('static', filename='img/logo-oficial.png') }}">
+
+            <div class="logo-text">
+
+                <h1>POSTO NOVA ROTA</h1>
+
+                <p>
+                    Mais que um posto, soluções para o seu dia.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="menu">
+
+            <a href="#">Início</a>
+            <a href="#servicos">Serviços</a>
+            <a href="#esg">ESG</a>
+            <a href="#sobre">Sobre Nós</a>
+            <a href="#">Contato</a>
+
+        </div>
+
+        <div class="buttons">
+
+            <a href="/login" class="btn-login">
+                Login
+            </a>
+
+            <a href="/cliente" class="btn-area">
+                Área do Cliente
+            </a>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-container">
+
+            <div class="hero-text">
+
+                <h1>
+                    Mais que <br>
+                    abastecimento.
+                </h1>
+
+                <p>
+                    Tecnologia, praticidade e confiança para sua empresa.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#servicos" class="btn-primary">
+                        Conheça nossos serviços
+                    </a>
+
+                    <a href="/login" class="btn-secondary">
+                        Acessar sistema
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="hero-image">
+
+                <img src="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?q=80&w=1974&auto=format&fit=crop">
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SOBRE -->
+
+    <section class="sobre" id="sobre">
+
+        <h2 class="titulo">
+            SOBRE A NOVA ROTA
+        </h2>
+
+        <div class="sobre-grid">
+
+            <div class="sobre-text">
+
+                <p>
+                    Nosso posto nasceu com o propósito de oferecer mais do que abastecimento: proporcionar confiança, praticidade e uma experiência positiva para cada cliente.
+                </p>
+
+                <p>
+                    Tempo e economia fazem diferença, por isso unimos qualidade, atendimento acessível e preços justos.
+                </p>
+
+                <p>
+                    Valorizamos nossa comunidade e trabalhamos para sermos referência em custo-benefício, transparência e excelência no serviço.
+                </p>
+
+            </div>
+
+            <div class="sobre-img">
+
+                <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1974&auto=format&fit=crop">
+
+            </div>
+
+        </div>
+
+        <!-- MVV -->
+
+        <div class="mvv">
+
+            <div class="mvv-card">
+
+                <h3>MISSÃO</h3>
+
+                <p>
+                    Oferecer combustível e serviços de qualidade com preços justos e atendimento humanizado.
+                </p>
+
+            </div>
+
+            <div class="mvv-card">
+
+                <h3>VISÃO</h3>
+
+                <p>
+                    Ser reconhecido como o posto mais confiável e acessível da região.
+                </p>
+
+            </div>
+
+            <div class="mvv-card">
+
+                <h3>VALORES</h3>
+
+                <p>
+
+                    • Qualidade <br>
+                    • Transparência <br>
+                    • Sustentabilidade <br>
+                    • Inovação
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- ESG -->
+
+        <div class="esg" id="esg">
+
+            <h2 class="titulo">
+                ESG - NOSSO COMPROMISSO
+            </h2>
+
+            <div class="esg-grid">
+
+                <div class="esg-card">
+
+                    <h3>AMBIENTAL</h3>
+
+                    <p>
+                        Uso consciente de recursos e descarte correto de resíduos.
+                    </p>
+
+                </div>
+
+                <div class="esg-card">
+
+                    <h3>SOCIAL</h3>
+
+                    <p>
+                        Atendimento humanizado e valorização da comunidade local.
+                    </p>
+
+                </div>
+
+                <div class="esg-card">
+
+                    <h3>GOVERNANÇA</h3>
+
+                    <p>
+                        Transparência e segurança de dados através do sistema Nova Rota.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SERVIÇOS -->
+
+    <section class="servicos" id="servicos">
+
+        <h2 class="titulo">
+            NOSSOS SERVIÇOS
+        </h2>
+
+        <div class="cards">
+
+            <a href="/combustiveis" class="card">
+
+                <img src="https://images.unsplash.com/photo-1604147495798-57beb5d6af73?q=80&w=1974&auto=format&fit=crop">
+
+                <div class="card-content">
+
+                    <h3>COMBUSTÍVEL</h3>
+
+                    <p>
+                        Abastecimento com qualidade e segurança.
+                    </p>
+
+                </div>
+
+            </a>
+
+            <a href="/lavagem" class="card">
+
+                <img src="https://images.unsplash.com/photo-1607861716497-e65ab29fc7ac?q=80&w=1974&auto=format&fit=crop">
+
+                <div class="card-content">
+
+                    <h3>LAVAGEM</h3>
+
+                    <p>
+                        Lavagem simples e completa para seu veículo.
+                    </p>
+
+                </div>
+
+            </a>
+
+            <a href="/estacionamento" class="card">
+
+                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1974&auto=format&fit=crop">
+
+                <div class="card-content">
+
+                    <h3>ESTACIONAMENTO ROTATIVO</h3>
+
+                    <p>
+                        Mais praticidade e controle para o seu dia.
+                    </p>
+
+                </div>
+
+            </a>
+
+            <a href="/mensal" class="card">
+
+                <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?q=80&w=1974&auto=format&fit=crop">
+
+                <div class="card-content">
+
+                    <h3>ESTACIONAMENTO MENSAL</h3>
+
+                    <p>
+                        Soluções completas para empresas e frotas.
+                    </p>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- LOGIN -->
+
+    <section class="login-preview">
+
+        <h2 class="titulo">
+            ACESSE SUA CONTA
+        </h2>
+
+        <div class="login-box">
+
+            <div class="login-options">
+
+                <div class="option">
+
+                    <h3>Cliente</h3>
+
+                    <p>
+                        Consulte boletos, pagamentos e serviços.
+                    </p>
+
+                </div>
+
+                <div class="option">
+
+                    <h3>Funcionário</h3>
+
+                    <p>
+                        Acesse o sistema interno da empresa.
+                    </p>
+
+                </div>
+
+                <div class="option">
+
+                    <h3>Administrador</h3>
+
+                    <p>
+                        Controle completo do sistema.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="form-login">
+
+                <h2>
+                    Login - Cliente
+                </h2>
+
+                <input type="text" placeholder="CNPJ">
+
+                <input type="password" placeholder="Senha">
+
+                <button>
+                    Entrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <h2>
+            POSTO NOVA ROTA
+        </h2>
+
+        <p>
+            Tecnologia, segurança e praticidade para empresas e clientes.
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

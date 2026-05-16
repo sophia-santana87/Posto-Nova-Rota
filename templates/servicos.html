@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body class="inner-page">
+    <nav class="page-nav">
+        <a class="brand dark" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+            <span class="brand-name">Nova Rota</span>
+        </a>
+        <div class="nav-links dark">
+            <a href="{{ url_for('servicos') }}">Serviços</a>
+            <a href="{{ url_for('esg') }}">ESG</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+        </div>
+        <div class="nav-actions">
+            <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+            <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+        </div>
+    </nav>
+
+    <main class="service-band">
+        <section class="section page-section">
+            <h1 class="section-title">Nossos Serviços</h1>
+            <div class="service-grid services-three">
+                <a class="service-card" href="{{ url_for('servico_combustivel') }}">
+                    <img src="{{ url_for('static', filename='img/servico-combustivel.png') }}" alt="Abastecimento de combustível Nova Rota">
+                    <div>
+                        <h3>Combustível</h3>
+                        <p>Abastecimento com qualidade e segurança.</p>
+                    </div>
+                </a>
+
+                <a class="service-card" href="{{ url_for('servico_lavagem') }}">
+                    <img src="{{ url_for('static', filename='img/servico-lavagem.png') }}" alt="Lavagem Nova Rota">
+                    <div>
+                        <h3>Lavagem</h3>
+                        <p>Lavagem simples e completa para seu veículo.</p>
+                    </div>
+                </a>
+
+                <a class="service-card" href="{{ url_for('servico_estacionamento') }}">
+                    <img src="{{ url_for('static', filename='img/servico-estacionamento.png') }}" alt="Estacionamento Nova Rota">
+                    <div>
+                        <h3>Estacionamento Rotativo</h3>
+                        <p>Mais praticidade e controle para o seu dia.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

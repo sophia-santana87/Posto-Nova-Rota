@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>{{ inline_css|safe }}</style>
+</head>
+<body class="inner-page">
+    <nav class="page-nav">
+        <a class="brand dark" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+            <span class="brand-name">Nova Rota</span>
+        </a>
+        <div class="nav-links dark">
+            <a href="{{ url_for('servicos') }}">Serviços</a>
+            <a href="{{ url_for('esg') }}">ESG</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
+            <a href="{{ url_for('contato') }}">Contato</a>
+        </div>
+        <div class="nav-actions">
+            <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+            <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+        </div>
+    </nav>
+
+    <main class="section page-section esg-page">
+        <section class="esg-hero-panel">
+            <p class="eyebrow">Compromisso Nova Rota</p>
+            <h1>ESG aplicado à operação</h1>
+            <p>Unimos eficiência, responsabilidade ambiental, cuidado com pessoas e gestão transparente para entregar uma experiência confiável todos os dias.</p>
+        </section>
+
+        <section class="esg-pillars">
+            <article class="esg-pillar">
+                <span>01</span>
+                <h2>Ambiental</h2>
+                <p>Uso consciente de recursos, reaproveitamento de água quando aplicável e descarte correto de resíduos operacionais.</p>
+            </article>
+
+            <article class="esg-pillar">
+                <span>02</span>
+                <h2>Social</h2>
+                <p>Valorização dos colaboradores, atendimento humanizado e relacionamento próximo com clientes e comunidade local.</p>
+            </article>
+
+            <article class="esg-pillar">
+                <span>03</span>
+                <h2>Governança</h2>
+                <p>Processos organizados, segurança de dados e controle eficiente por meio do sistema RotaFácil.</p>
+            </article>
+        </section>
+
+        <section class="esg-statement">
+            <h2>Prática, controle e transparência</h2>
+            <p>O compromisso ESG da Nova Rota aparece nas pequenas decisões da operação: economia de recursos, padronização do atendimento, registro dos serviços e informações acessíveis para clientes e empresas.</p>
+        </section>
+    </main>
+</body>
+</html>
