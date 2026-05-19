@@ -5,55 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Administrador</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="../../static/css/style.css">
     <style>{{ inline_css|safe }}</style>
 </head>
 <body>
-    <div class="app-layout">
+    <div class="app-layout dashboard-shell">
         <aside class="sidebar">
-            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
+            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
+                <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+                <span>Nova Rota</span>
+            </a>
             <nav class="side-nav">
-                <a class="active" href="#">Dashboard</a>
+                <a class="active" href="{{ url_for('dashboard_admin') }}">Dashboard</a>
                 <a href="#">Clientes</a>
                 <a href="#">Boletos</a>
                 <a href="#">Serviços</a>
-                <a href="#">Pagamentos</a>
-                <a href="#">Relatórios</a>
-                <a href="#">Usuários</a>
-                <a href="#">Configurações</a>
-                <a href="{{ url_for('home') }}">Sair</a>
+                <a href="#">Faturas</a>
+                <a href="#">Veículos</a>
+                <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
         <main class="app-main">
             <header class="topbar">
                 <h1>Dashboard - Administrador</h1>
-                <span>Bem-vindo, Admin</span>
+                <span>Bem-vindo, {{ usuario.nome }}</span>
             </header>
             <section class="dashboard">
                 <div class="metric-grid">
-                    <article class="metric-card"><small>Clientes Ativos</small><strong>128</strong><span>+12 este mês</span></article>
-                    <article class="metric-card"><small>Faturamento (mês)</small><strong>R$ 45.780,00</strong><span>+8% este mês</span></article>
-                    <article class="metric-card"><small>Boletos Pagos</small><strong>96</strong><span>+15 este mês</span></article>
-                    <article class="metric-card"><small>Boletos Atrasados</small><strong>32</strong><span>+5 este mês</span></article>
+                    <article class="metric-card"><small>Clientes Ativos</small><strong>{{ resumo.clientes }}</strong><span>dados do MySQL</span></article>
+                    <article class="metric-card"><small>Faturamento estimado</small><strong>R$ {{ '%.2f'|format(resumo.faturamento) }}</strong><span>serviços registrados</span></article>
+                    <article class="metric-card"><small>Boletos Pagos</small><strong>{{ resumo.boletos_pagos }}</strong><span>status PAGO</span></article>
+                    <article class="metric-card"><small>Boletos Atrasados</small><strong>{{ resumo.boletos_atrasados }}</strong><span>status ATRASADO</span></article>
                 </div>
                 <div class="dashboard-grid">
                     <article class="chart-card">
-                        <h2>Faturamento (últimos 6 meses)</h2>
-                        <div class="bars"><i style="height: 28%"></i><i style="height: 48%"></i><i style="height: 52%"></i><i style="height: 78%"></i><i style="height: 64%"></i><i style="height: 92%"></i></div>
+                        <h2>Permissões do administrador</h2>
+                        <p>O admin pode inserir, editar e excluir dados operacionais, incluindo preços e descontos, sem alterar estrutura, PK ou FK do banco.</p>
                     </article>
                     <article class="chart-card">
                         <h2>Boletos por Status</h2>
                         <div class="donut"></div>
-                        <p>Pagos 75% • Em aberto 15% • Atrasados 10%</p>
+                        <p>Pagos, em aberto e atrasados conforme a tabela boleto.</p>
                     </article>
                     <article class="chart-card">
                         <h2>Serviços mais utilizados</h2>
                         <div class="progress-list">
-                            <div class="progress-row"><span>Combustível</span><div class="track"><i style="width:65%"></i></div><strong>65%</strong></div>
-                            <div class="progress-row"><span>Lavagem</span><div class="track"><i style="width:15%"></i></div><strong>15%</strong></div>
-                            <div class="progress-row"><span>Estacionamento Rotativo</span><div class="track"><i style="width:10%"></i></div><strong>10%</strong></div>
-                            <div class="progress-row"><span>Estacionamento Mensal</span><div class="track"><i style="width:10%"></i></div><strong>10%</strong></div>
+                            {% for servico in resumo.servicos %}
+                                <div class="progress-row">
+                                    <span>{{ servico.nome }}</span>
+                                    <div class="track"><i style="width:{{ servico.percentual }}%"></i></div>
+                                    <strong>{{ servico.percentual }}%</strong>
+                                </div>
+                            {% endfor %}
                         </div>
                     </article>
                 </div>

@@ -5,42 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Funcionário</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="../../static/css/style.css">
     <style>{{ inline_css|safe }}</style>
 </head>
 <body>
-    <main class="client-shell">
+    <div class="app-layout dashboard-shell employee-dashboard">
         <aside class="sidebar employee">
-            <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
+            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
+                <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
+                <span>Nova Rota</span>
+            </a>
             <nav class="side-nav">
-                <a class="active" href="#">Início</a>
-                <a href="#">Clientes</a>
-                <a href="#">Serviços</a>
-                <a href="#">Pagamentos</a>
-                <a href="{{ url_for('home') }}">Sair</a>
+                <button class="{{ '' if busca else 'active' }}" type="button" data-panel="visao-geral">Dashboard</button>
+                <button class="{{ 'active' if busca else '' }}" type="button" data-panel="clientes">Clientes</button>
+                <button type="button" data-panel="boletos">Boletos</button>
+                <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
-        <section class="client-content">
-            <h1>Bem-vindo, João Silva</h1>
-            <article class="content-panel">
-                <h2>Ações rápidas</h2>
-                <div class="quick-actions">
-                    <a class="btn" href="#">Registrar Serviço</a>
-                    <a class="btn" href="#">Consultar Cliente</a>
-                    <a class="btn" href="#">Registrar Pagamento</a>
+
+        <main class="app-main">
+            <header class="topbar employee-topbar">
+                <div>
+                    <span class="topbar-kicker">Operação Nova Rota</span>
+                    <h1>Dashboard do Funcionário</h1>
                 </div>
-                <h2>Serviços registrados hoje</h2>
-                <table class="table">
-                    <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Horário</th></tr></thead>
-                    <tbody>
-                        <tr><td>Empresa ABC Ltda</td><td>Combustível</td><td>R$ 250,00</td><td>08:15</td></tr>
-                        <tr><td>Transportes XYZ</td><td>Lavagem</td><td>R$ 80,00</td><td>09:20</td></tr>
-                        <tr><td>Empresa Exemplo Ltda</td><td>Estacionamento</td><td>R$ 120,00</td><td>10:35</td></tr>
-                    </tbody>
-                </table>
-            </article>
-        </section>
-    </main>
+                <span>Bem-vindo, {{ usuario.nome }}</span>
+            </header>
+
+            <section class="dashboard employee-workspace">
+                <div class="employee-panel {{ '' if busca else 'active' }}" data-panel-content="visao-geral">
+                    <article class="chart-card status-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Boletos por status</h2>
+                                <p>{{ resumo.total_boletos }} boletos monitorados pela equipe.</p>
+                            </div>
+                        </div>
+                        <div class="status-chart">
+                            <div class="donut employee-donut"
+                                 style="--paid: {{ (resumo.boletos_pagos / resumo.total_boletos * 100) if resumo.total_boletos else 0 }}%; --open: {{ ((resumo.boletos_pagos + resumo.boletos_abertos) / resumo.total_boletos * 100) if resumo.total_boletos else 0 }}%;"></div>
+                            <div class="status-legend">
+                                <span><i class="paid-dot"></i>Pagos: {{ resumo.boletos_pagos }}</span>
+                                <span><i class="open-dot"></i>Em aberto: {{ resumo.boletos_abertos }}</span>
+                                <span><i class="late-dot"></i>Atrasados: {{ resumo.boletos_atrasados }}</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="content-panel" id="boletos-resumo">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Boletos a vencer</h2>
+                                <p>Prioridade para vencimentos em aberto e atrasados.</p>
+                            </div>
+                        </div>
+                        <div class="table-frame centered-table">
+                            <table class="table employee-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Vencimento</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for boleto in resumo.proximos_boletos %}
+                                <tr>
+                                    <td>{{ boleto.razao_social }}</td>
+                                    <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                                    <td>R$ {{ '%.2f'|format(boleto.valor) }}</td>
+                                    <td><span class="pill {{ 'late' if boleto.status_pagamento == 'ATRASADO' else 'open' }}">{{ boleto.status_pagamento }}</span></td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="4">Nenhum boleto em aberto ou atrasado.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="content-panel client-search-panel employee-panel {{ 'active' if busca else '' }}" id="clientes" data-panel-content="clientes">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Consulta de clientes</h2>
+                            <p>Pesquise por nome da empresa para consultar boletos e situação financeira.</p>
+                        </div>
+                    </div>
+                    <form class="client-search" method="get" action="{{ url_for('dashboard_funcionario') }}">
+                        <input type="search" name="cliente" value="{{ busca }}" placeholder="Digite o nome da empresa">
+                        <button class="btn primary" type="submit">Pesquisar</button>
+                        {% if busca %}
+                            <a class="btn ghost employee-clear" href="{{ url_for('dashboard_funcionario') }}">Limpar</a>
+                        {% endif %}
+                    </form>
+
+                    <div class="client-result-grid">
+                        {% for cliente in clientes %}
+                            <article class="client-result">
+                                <div>
+                                    <strong>{{ cliente.razao_social }}</strong>
+                                    <span>{{ cliente.email or 'E-mail não informado' }}</span>
+                                </div>
+                                <dl>
+                                    <div><dt>Boletos</dt><dd>{{ cliente.boletos or 0 }}</dd></div>
+                                    <div><dt>Em aberto</dt><dd>{{ cliente.abertos or 0 }}</dd></div>
+                                    <div><dt>Atrasados</dt><dd>{{ cliente.atrasados or 0 }}</dd></div>
+                                </dl>
+                            </article>
+                        {% else %}
+                            <p class="empty-state">Nenhum cliente encontrado para essa pesquisa.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel" id="boletos" data-panel-content="boletos">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Controle de boletos</h2>
+                            <p>Detalhamento dos vencimentos que precisam de acompanhamento.</p>
+                        </div>
+                    </div>
+                    <div class="table-frame centered-table full-boletos-table">
+                        <table class="table employee-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Serviço</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for boleto in resumo.proximos_boletos %}
+                                <tr>
+                                    <td>{{ boleto.razao_social }}</td>
+                                    <td>{{ boleto.servico }}</td>
+                                    <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                                    <td>R$ {{ '%.2f'|format(boleto.valor) }}</td>
+                                    <td><span class="pill {{ 'late' if boleto.status_pagamento == 'ATRASADO' else 'open' }}">{{ boleto.status_pagamento }}</span></td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5">Nenhum boleto em aberto ou atrasado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+    <script>
+        const panelButtons = document.querySelectorAll('[data-panel]');
+        const panels = document.querySelectorAll('[data-panel-content]');
+
+        panelButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const panel = button.dataset.panel;
+                panelButtons.forEach((item) => item.classList.toggle('active', item === button));
+                panels.forEach((item) => item.classList.toggle('active', item.dataset.panelContent === panel));
+            });
+        });
+    </script>
 </body>
 </html>

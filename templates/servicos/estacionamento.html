@@ -20,7 +20,7 @@
             <a href="{{ url_for('contato') }}">Contato</a>
         </div>
         <div class="nav-actions">
-            <a class="btn ghost" href="{{ url_for('login') }}">Login</a>
+            <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
             <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
         </div>
     </nav>
