@@ -1653,6 +1653,6 @@ def internal_error(_):
 if __name__ == '__main__':
     app.run(
         debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true',
-        host='127.0.0.1',
+        host=os.getenv('HOST', '0.0.0.0'),
         port=int(os.getenv('PORT', '8001')),
     )
