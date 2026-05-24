@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir senha - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
+</head>
+<body>
+    <main class="access-page">
+        <section class="access-card reset-access-card">
+            <div>
+                <a class="login-brand" href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
+                    <span>Nova Rota</span>
+                </a>
+                <h1>Cadastro ou redefinicao de senha</h1>
+                <p>Primeiro informe o CNPJ. Depois confirme o e-mail cadastrado, como em uma validacao de acesso.</p>
+            </div>
+
+            <form class="login-card" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {% if enviado %}
+                    <div class="form-success">
+                        <strong>Solicitacao validada.</strong>
+                        <span>Para a demonstracao do trabalho, a senha provisoria do cliente continua sendo cliente123.</span>
+                    </div>
+                {% endif %}
+
+                {% if erro %}
+                    <div class="form-error">
+                        <strong>Atencao:</strong>
+                        <span>{{ erro }}</span>
+                    </div>
+                {% endif %}
+
+                {% if etapa == 'confirmar' %}
+                    <input type="hidden" name="etapa" value="confirmar">
+                    <input type="hidden" name="cnpj" value="{{ cnpj }}">
+                    <h2>Confirme seu e-mail</h2>
+                    <p class="reset-hint">O e-mail cadastrado e <strong>{{ email_mascarado }}</strong>.</p>
+
+                    <label class="form-field">
+                        <span>Digite o e-mail completo</span>
+                        <input type="email" name="email_confirmacao" placeholder="email@empresa.com" required>
+                    </label>
+                {% elif etapa == 'concluido' %}
+                    <input type="hidden" name="etapa" value="cnpj">
+                    <h2>Acesso recuperado</h2>
+                    <p class="reset-hint">Agora volte ao login do cliente e entre com o CNPJ informado.</p>
+                {% else %}
+                    <input type="hidden" name="etapa" value="cnpj">
+                    <label class="form-field">
+                        <span>CNPJ</span>
+                        <input name="cnpj" value="{{ cnpj }}" placeholder="00.000.000/0000-00" required>
+                    </label>
+                {% endif %}
+
+                {% if etapa == 'concluido' %}
+                    <a class="btn login-submit" href="{{ url_for('login', tipo='cliente') }}">Voltar ao login</a>
+                {% else %}
+                    <button class="btn login-submit" type="submit">
+                        {% if etapa == 'confirmar' %}Validar e-mail{% else %}Continuar{% endif %}
+                    </button>
+                {% endif %}
+
+                <p class="center-note"><a href="{{ url_for('login', tipo='cliente') }}">Voltar ao login</a></p>
+            </form>
+        </section>
+        {% include '_footer.html' %}
+    </main>
+</body>
+</html>

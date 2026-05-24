@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serviços - Posto Nova Rota</title>
+    <title>Servicos - Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
     <nav class="page-nav">
@@ -14,26 +14,27 @@
             <span class="brand-name">Nova Rota</span>
         </a>
         <div class="nav-links dark">
-            <a href="{{ url_for('servicos') }}">Serviços</a>
+            <a href="{{ url_for('servicos') }}">Servicos</a>
             <a href="{{ url_for('esg') }}">ESG</a>
-            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nos</a>
             <a href="{{ url_for('contato') }}">Contato</a>
         </div>
         <div class="nav-actions">
             <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
-            <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+            <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Area do Cliente</a>
         </div>
     </nav>
 
     <main class="service-band">
         <section class="section page-section">
-            <h1 class="section-title">Nossos Serviços</h1>
+            <h1 class="section-title">Nossos Servicos</h1>
             <div class="service-grid services-three">
                 <a class="service-card" href="{{ url_for('servico_combustivel') }}">
-                    <img src="{{ url_for('static', filename='img/servico-combustivel.png') }}" alt="Abastecimento de combustível Nova Rota">
+                    <img src="{{ url_for('static', filename='img/servico-combustivel.png') }}" alt="Abastecimento de combustivel Nova Rota">
                     <div>
-                        <h3>Combustível</h3>
-                        <p>Abastecimento com qualidade e segurança.</p>
+                        <h3>Combustivel</h3>
+                        <p>Gasolina comum, aditivada, etanol e diesel S10 com precos fixos por litro.</p>
+                        <strong class="price-chip">A partir de {{ (precos[0].valor_unitario if precos else 5.49)|brl }}</strong>
                     </div>
                 </a>
 
@@ -41,19 +42,22 @@
                     <img src="{{ url_for('static', filename='img/servico-lavagem.png') }}" alt="Lavagem Nova Rota">
                     <div>
                         <h3>Lavagem</h3>
-                        <p>Lavagem simples e completa para seu veículo.</p>
+                        <p>Modalidades simples, completa, higienizacao interna e acabamento especial.</p>
+                        <strong class="price-chip">A partir de {{ (precos[1].valor_unitario if precos|length > 1 else 35)|brl }}</strong>
                     </div>
                 </a>
 
                 <a class="service-card" href="{{ url_for('servico_estacionamento') }}">
                     <img src="{{ url_for('static', filename='img/servico-estacionamento.png') }}" alt="Estacionamento Nova Rota">
                     <div>
-                        <h3>Estacionamento Rotativo</h3>
-                        <p>Mais praticidade e controle para o seu dia.</p>
+                        <h3>Estacionamento</h3>
+                        <p>Rotativo por hora, diaria e plano mensal para empresas e clientes frequentes.</p>
+                        <strong class="price-chip">A partir de {{ (precos[2].valor_unitario if precos|length > 2 else 8)|brl }}</strong>
                     </div>
                 </a>
             </div>
         </section>
     </main>
+    {% include '_footer.html' %}
 </body>
 </html>

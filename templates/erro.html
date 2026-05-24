@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro - Posto Nova Rota</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
+</head>
+<body class="inner-page">
+    <main class="section page-section">
+        <section class="about-hero-panel">
+            <p class="eyebrow">RotaFacil</p>
+            <h1>{{ erro }}</h1>
+            <p>Volte para a pagina inicial ou tente acessar novamente em instantes.</p>
+            <div class="hero-buttons">
+                <a class="btn btn-highlight" href="{{ url_for('home') }}">Voltar ao inicio</a>
+            </div>
+        </section>
+    </main>
+    {% include '_footer.html' %}
+</body>
+</html>

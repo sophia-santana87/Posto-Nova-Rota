@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESG - Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
     <nav class="page-nav">
@@ -57,5 +57,6 @@
             <p>O compromisso ESG da Nova Rota aparece nas pequenas decisões da operação: economia de recursos, padronização do atendimento, registro dos serviços e informações acessíveis para clientes e empresas.</p>
         </section>
     </main>
+    {% include '_footer.html' %}
 </body>
 </html>

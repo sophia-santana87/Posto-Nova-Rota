@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body>
+    
     <div class="site-shell home-only">
         <header class="hero full-hero" id="inicio">
             <nav class="site-nav">
@@ -23,10 +24,10 @@
                     <a href="{{ url_for('contato') }}">Contato</a>
                 </div>
 
-                <div class="nav-actions">
-                    <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
-                    <a class="btn primary" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
-                </div>
+               <div class="nav-actions">
+    <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
+    <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
+</div>
             </nav>
 
             <div class="hero-content">
@@ -35,12 +36,12 @@
                     <h2>Tecnologia, praticidade e confiança para sua empresa.</h2>
                     <p>O sistema RotaFácil conecta gestão, pagamentos e serviços automotivos em uma única plataforma.</p>
                     <div class="hero-buttons">
-                        <a class="btn primary" href="{{ url_for('servicos') }}">Conheça nossos serviços</a>
-                        <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Acessar sistema</a>
-                    </div>
+                        <a class="btn btn-highlight hero-service-cta" href="{{ url_for('servicos') }}">Conheça nossos serviços</a>
+                        </div>
                 </div>
             </div>
         </header>
+        {% include '_footer.html' %}
     </div>
 </body>
 </html>

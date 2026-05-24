@@ -5,42 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body>
     <main class="access-page">
-        <a class="back-home" href="{{ url_for('home') }}">← Página principal</a>
         <section class="access-card">
             <div>
                 <a class="login-brand" href="{{ url_for('home') }}">
                     <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Nova Rota">
                     <span>Nova Rota</span>
                 </a>
-                <h1>{{ 'Área do Cliente' if tipo == 'cliente' else 'Acesso ao Sistema' }}</h1>
+
+                <h1>{% if tipo == 'cliente' %}Area do Cliente{% else %}Acesso ao Sistema{% endif %}</h1>
                 <p>
                     {% if tipo == 'cliente' %}
-                        Acesse seus boletos, serviços e dados cadastrais.
+                        Acesse seus boletos, servicos e dados cadastrais.
                     {% else %}
-                        Acesso interno para funcionário e administrador.
+                        Acesso interno para funcionario e administrador.
                     {% endif %}
                 </p>
+
                 <div class="access-options">
                     {% if tipo == 'cliente' %}
                         <a class="access-option active" href="{{ url_for('login', tipo='cliente') }}">
                             <span class="icon-badge green">C</span>
-                            <span><strong>Cliente</strong><br><small>Acesse boletos, serviços e dados da empresa.</small></span>
-                            <strong>›</strong>
+                            <span><strong>Cliente</strong><br><small>Acesse boletos e servicos da empresa.</small></span>
+                            <strong>&rsaquo;</strong>
                         </a>
                     {% else %}
                         <a class="access-option {{ 'active' if tipo == 'funcionario' else '' }}" href="{{ url_for('login', tipo='funcionario') }}">
                             <span class="icon-badge blue">F</span>
-                            <span><strong>Funcionário</strong><br><small>Consulte clientes e registre serviços.</small></span>
-                            <strong>›</strong>
+                            <span><strong>Funcionario</strong><br><small>Consulte clientes e registre servicos.</small></span>
+                            <strong>&rsaquo;</strong>
                         </a>
                         <a class="access-option {{ 'active' if tipo == 'admin' else '' }}" href="{{ url_for('login', tipo='admin') }}">
                             <span class="icon-badge purple">A</span>
                             <span><strong>Administrador</strong><br><small>Acesso completo aos dados operacionais.</small></span>
-                            <strong>›</strong>
+                            <strong>&rsaquo;</strong>
                         </a>
                     {% endif %}
                 </div>
@@ -49,44 +50,57 @@
             <div class="access-divider"></div>
 
             <form class="login-card" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="tipo" value="{{ tipo }}">
-                <h2>Login - {{ 'Cliente' if tipo == 'cliente' else 'Funcionário' if tipo == 'funcionario' else 'Administrador' }}</h2>
-                <p>
-                    {% if tipo == 'cliente' %}
-                        Entre com seu CNPJ e senha.
-                    {% elif tipo == 'funcionario' %}
-                        Use o identificador funcionario e sua senha.
-                    {% else %}
-                        Use o identificador admin e sua senha.
-                    {% endif %}
-                </p>
+
+                <h2>Login - {{ tipo|capitalize }}</h2>
 
                 {% if erro %}
                     <div class="form-error">
-                        <strong>Acesso não autorizado.</strong>
+                        <strong>Erro:</strong>
                         <span>{{ erro }}</span>
                     </div>
                 {% endif %}
 
                 <label class="form-field">
                     <span>{{ 'CNPJ' if tipo == 'cliente' else 'Identificador' }}</span>
-                    <input name="cnpj" placeholder="{{ '00.000.000/0000-00' if tipo == 'cliente' else tipo }}" required>
+                    <input name="cnpj" placeholder="{{ '00.000.000/0000-00' if tipo == 'cliente' else 'Seu usuario' }}" required>
                 </label>
 
                 <label class="form-field">
                     <span>Senha</span>
-                    <input name="senha" type="password" placeholder="Digite sua senha" required>
+                    <span class="password-control">
+                        <input name="senha" type="password" placeholder="Digite sua senha" required>
+                        <button type="button" class="password-toggle" aria-label="Mostrar senha" data-password-toggle>
+                            <span class="eye-icon"></span>
+                        </button>
+                    </span>
                 </label>
 
-                <button class="btn green" type="submit">Entrar</button>
+                <button class="btn login-submit" type="submit">Entrar</button>
 
-                {% if tipo == 'cliente' %}
-                    <p class="center-note">Acesso interno? <a href="{{ url_for('login', tipo='funcionario') }}">Entrar como funcionário ou admin</a></p>
-                {% else %}
-                    <p class="center-note">É cliente? <a href="{{ url_for('login', tipo='cliente') }}">Acessar Área do Cliente</a></p>
-                {% endif %}
+                <p class="center-note">
+                    {% if tipo == 'cliente' %}
+                        <a href="{{ url_for('redefinir_senha') }}">Esqueci minha senha ou preciso de cadastro</a><br>
+                        Acesso interno? <a href="{{ url_for('login', tipo='funcionario') }}">Entrar como funcionario ou admin</a>
+                    {% else %}
+                        E cliente? <a href="{{ url_for('login', tipo='cliente') }}">Acessar Area do Cliente</a>
+                    {% endif %}
+                </p>
             </form>
         </section>
+        {% include '_footer.html' %}
     </main>
+    <script>
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const input = button.parentElement.querySelector('input');
+                const mostrar = input.type === 'password';
+                input.type = mostrar ? 'text' : 'password';
+                button.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+                button.classList.toggle('active', mostrar);
+            });
+        });
+    </script>
 </body>
 </html>

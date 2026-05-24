@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contato - Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
     <nav class="page-nav">
@@ -36,6 +36,8 @@
 
         <section class="contact-layout">
             <form class="contact-form" action="{{ url_for('contato') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 {% if enviado %}
                     <div class="form-success">
                         <strong>Mensagem registrada com sucesso.</strong>
@@ -123,5 +125,6 @@
             </aside>
         </section>
     </main>
+    {% include '_footer.html' %}
 </body>
 </html>

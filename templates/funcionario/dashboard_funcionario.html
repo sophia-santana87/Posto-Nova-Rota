@@ -3,36 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Funcionário</title>
+    <title>Area do Funcionario</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-responsive.css') }}">
 </head>
-<body>
-    <div class="app-layout dashboard-shell employee-dashboard">
+<body class="employee-dashboard">
+    <div class="app-layout dashboard-shell">
         <aside class="sidebar employee">
-            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
+            <a class="dashboard-brand" href="{{ url_for('home') }}">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
                 <span>Nova Rota</span>
             </a>
+            <button class="dashboard-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu">
+                <span></span><span></span><span></span>
+            </button>
             <nav class="side-nav">
-                <button class="{{ '' if busca else 'active' }}" type="button" data-panel="visao-geral">Dashboard</button>
-                <button class="{{ 'active' if busca else '' }}" type="button" data-panel="clientes">Clientes</button>
-                <button type="button" data-panel="boletos">Boletos</button>
+                <button class="{{ 'active' if painel_ativo == 'visao-geral' else '' }}" type="button" data-panel="visao-geral">Dashboard</button>
+                <button class="{{ 'active' if painel_ativo == 'clientes' else '' }}" type="button" data-panel="clientes">Clientes</button>
+                <button class="{{ 'active' if painel_ativo == 'boletos' else '' }}" type="button" data-panel="boletos">Boletos</button>
+                <button class="{{ 'active' if painel_ativo == 'faturamento' else '' }}" type="button" data-panel="faturamento">Faturamento mensal</button>
+                <button class="{{ 'active' if painel_ativo == 'registrar-servico' else '' }}" type="button" data-panel="registrar-servico">Registrar Serviço</button>
+                <button class="{{ 'active' if painel_ativo == 'relatorios' else '' }}" type="button" data-panel="relatorios">Relatórios</button>
                 <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
 
         <main class="app-main">
-            <header class="topbar employee-topbar">
+            <header class="topbar">
                 <div>
-                    <span class="topbar-kicker">Operação Nova Rota</span>
-                    <h1>Dashboard do Funcionário</h1>
+                    <span class="topbar-kicker">Operacao Nova Rota</span>
+                    <h1>Dashboard do Funcionario</h1>
                 </div>
                 <span>Bem-vindo, {{ usuario.nome }}</span>
             </header>
 
+            {% if mensagem %}<div class="form-success dashboard-message"><strong>{{ mensagem }}</strong></div>{% endif %}
+            {% if erro %}<div class="form-error dashboard-message"><strong>{{ erro }}</strong></div>{% endif %}
+
             <section class="dashboard employee-workspace">
-                <div class="employee-panel {{ '' if busca else 'active' }}" data-panel-content="visao-geral">
+                <div class="employee-panel {{ 'active' if painel_ativo == 'visao-geral' else '' }}" data-panel-content="visao-geral">
                     <article class="chart-card status-panel">
                         <div class="panel-heading">
                             <div>
@@ -42,131 +51,257 @@
                         </div>
                         <div class="status-chart">
                             <div class="donut employee-donut"
-                                 style="--paid: {{ (resumo.boletos_pagos / resumo.total_boletos * 100) if resumo.total_boletos else 0 }}%; --open: {{ ((resumo.boletos_pagos + resumo.boletos_abertos) / resumo.total_boletos * 100) if resumo.total_boletos else 0 }}%;"></div>
-                            <div class="status-legend">
-                                <span><i class="paid-dot"></i>Pagos: {{ resumo.boletos_pagos }}</span>
-                                <span><i class="open-dot"></i>Em aberto: {{ resumo.boletos_abertos }}</span>
-                                <span><i class="late-dot"></i>Atrasados: {{ resumo.boletos_atrasados }}</span>
+                                 style="--paid: {{ resumo.pct_pago }}%; --open: {{ resumo.pct_aberto }}%;"></div>
+                            <div class="status-legend employee-status-legend">
+                                <div class="status-hover paid">
+                                    <span><i class="paid-dot"></i>Pagos: {{ resumo.boletos_pagos }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_pagos %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto pago.</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="status-hover open">
+                                    <span><i class="open-dot"></i>Em aberto: {{ resumo.boletos_abertos }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_abertos %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto em aberto.</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="status-hover late">
+                                    <span><i class="late-dot"></i>Atrasados: {{ resumo.boletos_atrasados }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_atrasados %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto atrasado.</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </article>
 
-                    <article class="content-panel" id="boletos-resumo">
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Boletos a vencer</h2>
-                                <p>Prioridade para vencimentos em aberto e atrasados.</p>
-                            </div>
-                        </div>
-                        <div class="table-frame centered-table">
-                            <table class="table employee-table">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Vencimento</th>
-                                    <th>Valor</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for boleto in resumo.proximos_boletos %}
-                                <tr>
-                                    <td>{{ boleto.razao_social }}</td>
-                                    <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                                    <td>R$ {{ '%.2f'|format(boleto.valor) }}</td>
-                                    <td><span class="pill {{ 'late' if boleto.status_pagamento == 'ATRASADO' else 'open' }}">{{ boleto.status_pagamento }}</span></td>
-                                </tr>
-                            {% else %}
-                                <tr><td colspan="4">Nenhum boleto em aberto ou atrasado.</td></tr>
-                            {% endfor %}
-                            </tbody>
-                            </table>
+                    <article class="chart-card">
+                        <h2>Processo de vendas e boletos</h2>
+                        <div class="metric-grid mini-metrics">
+                            <article class="metric-card"><small>Em aberto</small><strong>{{ resumo.boletos_abertos }}</strong></article>
+                            <article class="metric-card"><small>Atrasados</small><strong>{{ resumo.boletos_atrasados }}</strong></article>
                         </div>
                     </article>
                 </div>
 
-                <article class="content-panel client-search-panel employee-panel {{ 'active' if busca else '' }}" id="clientes" data-panel-content="clientes">
+                <article class="content-panel client-search-panel employee-panel {{ 'active' if painel_ativo == 'clientes' else '' }}" data-panel-content="clientes">
                     <div class="panel-heading">
-                        <div>
-                            <h2>Consulta de clientes</h2>
-                            <p>Pesquise por nome da empresa para consultar boletos e situação financeira.</p>
-                        </div>
+                        <h2>Consulta de clientes</h2>
+                        <p>O CNPJ aparece mascarado para preservar os dados do cliente.</p>
                     </div>
                     <form class="client-search" method="get" action="{{ url_for('dashboard_funcionario') }}">
                         <input type="search" name="cliente" value="{{ busca }}" placeholder="Digite o nome da empresa">
                         <button class="btn primary" type="submit">Pesquisar</button>
-                        {% if busca %}
-                            <a class="btn ghost employee-clear" href="{{ url_for('dashboard_funcionario') }}">Limpar</a>
-                        {% endif %}
+                        {% if busca %}<a class="btn employee-clear" href="{{ url_for('dashboard_funcionario') }}">Limpar</a>{% endif %}
                     </form>
-
-                    <div class="client-result-grid">
-                        {% for cliente in clientes %}
-                            <article class="client-result">
-                                <div>
-                                    <strong>{{ cliente.razao_social }}</strong>
-                                    <span>{{ cliente.email or 'E-mail não informado' }}</span>
-                                </div>
-                                <dl>
-                                    <div><dt>Boletos</dt><dd>{{ cliente.boletos or 0 }}</dd></div>
-                                    <div><dt>Em aberto</dt><dd>{{ cliente.abertos or 0 }}</dd></div>
-                                    <div><dt>Atrasados</dt><dd>{{ cliente.atrasados or 0 }}</dd></div>
-                                </dl>
-                            </article>
-                        {% else %}
-                            <p class="empty-state">Nenhum cliente encontrado para essa pesquisa.</p>
-                        {% endfor %}
+                    <div class="table-frame">
+                        <table class="table employee-table">
+                            <thead><tr><th>Cliente</th><th>CNPJ</th><th>E-mail</th><th>Boletos</th><th>Em aberto</th></tr></thead>
+                            <tbody>
+                                {% for cliente in clientes %}
+                                    <tr>
+                                        <td>{{ cliente.razao_social }}</td>
+                                        <td>{{ cliente.cnpj_mascarado }}</td>
+                                        <td>{{ cliente.email }}</td>
+                                        <td>{{ cliente.total_boletos or 0 }}</td>
+                                        <td>{{ cliente.boletos_abertos or 0 }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="5">Nenhum cliente encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </article>
 
-                <article class="content-panel employee-panel" id="boletos" data-panel-content="boletos">
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'boletos' else '' }}" data-panel-content="boletos">
                     <div class="panel-heading">
-                        <div>
-                            <h2>Controle de boletos</h2>
-                            <p>Detalhamento dos vencimentos que precisam de acompanhamento.</p>
-                        </div>
+                        <h2>Boletos</h2>
+                        <p>Consulta operacional de vencimento, status e serviço vinculado.</p>
                     </div>
-                    <div class="table-frame centered-table full-boletos-table">
-                        <table class="table employee-table">
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Serviço</th>
-                                <th>Vencimento</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for boleto in resumo.proximos_boletos %}
-                                <tr>
-                                    <td>{{ boleto.razao_social }}</td>
-                                    <td>{{ boleto.servico }}</td>
-                                    <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                                    <td>R$ {{ '%.2f'|format(boleto.valor) }}</td>
-                                    <td><span class="pill {{ 'late' if boleto.status_pagamento == 'ATRASADO' else 'open' }}">{{ boleto.status_pagamento }}</span></td>
-                                </tr>
-                            {% else %}
-                                <tr><td colspan="5">Nenhum boleto em aberto ou atrasado.</td></tr>
+                    <form class="client-search boleto-filter-form" method="get" action="{{ url_for('dashboard_funcionario') }}">
+                        <input type="search" name="boleto_busca" value="{{ boleto_busca }}" placeholder="Filtrar por cliente ou serviço">
+                        <select name="boleto_status">
+                            <option value="">Todos os status</option>
+                            {% for status in ['PAGO', 'EM ABERTO', 'ATRASADO'] %}
+                                <option value="{{ status }}" {% if boleto_status == status %}selected{% endif %}>{{ status }}</option>
                             {% endfor %}
-                        </tbody>
+                        </select>
+                        <button class="btn primary" type="submit">Filtrar</button>
+                        {% if boleto_busca or boleto_status %}<a class="btn employee-clear" href="{{ url_for('dashboard_funcionario') }}">Limpar</a>{% endif %}
+                    </form>
+                    <div class="table-frame">
+                        <table class="table employee-table">
+                            <thead><tr><th>Cliente</th><th>Servico</th><th>Vencimento</th><th>Valor final</th><th>Status</th></tr></thead>
+                            <tbody>
+                                {% for boleto in boletos %}
+                                    <tr>
+                                        <td>{{ boleto.razao_social }}</td>
+                                        <td>{{ boleto.servico }}</td>
+                                        <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ (boleto.valor_unitario - (boleto.desconto or 0))|brl }}</td>
+                                        <td><span class="pill {{ classe_status(boleto.status_pagamento) }}">{{ boleto.status_pagamento }}</span></td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="5">Nenhum boleto encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'faturamento' else '' }}" data-panel-content="faturamento">
+                    <div class="panel-heading">
+                        <h2>Faturamento mensal</h2>
+                        <p>Conferencia do que cada cliente consumiu no mes antes da emissao dos boletos.</p>
+                    </div>
+                    <form class="client-search boleto-filter-form" method="get" action="{{ url_for('dashboard_funcionario') }}">
+                        <input type="search" name="faturamento_busca" value="{{ faturamento_busca }}" placeholder="Filtrar por cliente ou CNPJ">
+                        <input type="month" name="competencia" value="{{ competencia }}">
+                        <button class="btn primary" type="submit">Filtrar</button>
+                        {% if faturamento_busca or competencia %}<a class="btn employee-clear" href="{{ url_for('dashboard_funcionario') }}">Limpar</a>{% endif %}
+                    </form>
+                    <div class="table-frame">
+                        <table class="table employee-table">
+                            <thead><tr><th>Cliente</th><th>Mes</th><th>Servicos</th><th>Quantidade</th><th>Total</th><th>Pendentes</th></tr></thead>
+                            <tbody>
+                                {% for mensal in resumos_mensais %}
+                                    <tr>
+                                        <td>{{ mensal.razao_social }}</td>
+                                        <td>{{ mensal.competencia_label }}</td>
+                                        <td>{{ mensal.total_servicos }}</td>
+                                        <td>{{ mensal.total_quantidade }}</td>
+                                        <td>{{ mensal.total_mes|brl }}</td>
+                                        <td>{{ mensal.faturas_sem_boleto or 0 }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="6">Nenhum resumo mensal encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'registrar-servico' else '' }}" data-panel-content="registrar-servico">
+                    <div class="panel-heading">
+                        <h2>Registrar novo serviço</h2>
+                        <p>Selecione a empresa e valide o veículo vinculado antes de salvar o serviço.</p>
+                    </div>
+                    <form method="post" class="dashboard-form service-register-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <label>
+                            <span>Cliente</span>
+                            <select id="cliente-registro" name="cnpj" required>
+                                <option value="">Selecione cliente</option>
+                                {% for cliente in clientes_registro %}
+                                    <option
+                                        value="{{ cliente.cnpj }}"
+                                        data-veiculos='{{ cliente.veiculos|tojson }}'>
+                                        {{ cliente.razao_social }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>
+                            <span>Veículo vinculado</span>
+                            <select id="registro-veiculo" name="placa_veiculo" required disabled>
+                                <option value="">Selecione o cliente primeiro</option>
+                            </select>
+                        </label>
+                        <p class="vehicle-validation-note" id="registro-veiculo-aviso">
+                            Se a placa informada não pertencer a este cliente, converse com o administrador antes de registrar.
+                        </p>
+                        <label><span>Data do serviço</span><input name="data_registro" type="date" value="{{ hoje }}" required></label>
+                        <label>
+                            <span>Servico</span>
+                            <select name="tipo_servico" required>
+                                {% for servico in precos %}
+                                    <option value="{{ servico.id }}">
+                                        {{ servico.nome }} - {{ (servico.valor_unitario - (servico.desconto or 0))|brl }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label><span>Quantidade</span><input name="quantidade" type="number" step="0.01" min="0.01" value="1" required></label>
+                        <button type="submit" class="btn btn-highlight">Salvar serviço</button>
+                    </form>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'relatorios' else '' }}" data-panel-content="relatorios">
+                    <div class="panel-heading">
+                        <h2>Relatórios</h2>
+                        <p>Exportação operacional com boletos em aberto, boletos próximos do vencimento, atrasados e serviços prestados.</p>
+                    </div>
+                    <div class="report-card-grid">
+                        <section class="report-card">
+                            <h3>Relatório operacional</h3>
+                            <p>Separado por status de boleto, serviços prestados e vendas registradas pela equipe.</p>
+                            <div class="report-downloads">
+                                <a class="btn primary" href="{{ url_for('exportar_relatorio', perfil='funcionario', formato='csv') }}">CSV</a>
+                                <a class="btn" href="{{ url_for('exportar_relatorio', perfil='funcionario', formato='pdf') }}">PDF</a>
+                            </div>
+                        </section>
                     </div>
                 </article>
             </section>
         </main>
     </div>
     <script>
-        const panelButtons = document.querySelectorAll('[data-panel]');
-        const panels = document.querySelectorAll('[data-panel-content]');
-
-        panelButtons.forEach((button) => {
+        document.querySelectorAll('[data-panel]').forEach((button) => {
             button.addEventListener('click', () => {
-                const panel = button.dataset.panel;
-                panelButtons.forEach((item) => item.classList.toggle('active', item === button));
-                panels.forEach((item) => item.classList.toggle('active', item.dataset.panelContent === panel));
+                document.querySelectorAll('[data-panel]').forEach((item) => item.classList.remove('active'));
+                document.querySelectorAll('[data-panel-content]').forEach((panel) => panel.classList.remove('active'));
+                button.classList.add('active');
+                document.querySelector(`[data-panel-content="${button.dataset.panel}"]`).classList.add('active');
+                document.querySelector('.sidebar')?.classList.remove('nav-open');
+                document.querySelector('.dashboard-menu-toggle')?.setAttribute('aria-expanded', 'false');
             });
         });
+
+        document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
+            const sidebar = event.currentTarget.closest('.sidebar');
+            const aberto = sidebar.classList.toggle('nav-open');
+            event.currentTarget.setAttribute('aria-expanded', String(aberto));
+        });
+
+        const clienteRegistro = document.querySelector('#cliente-registro');
+        const veiculoRegistro = document.querySelector('#registro-veiculo');
+
+        if (clienteRegistro) {
+            clienteRegistro.addEventListener('change', () => {
+                const selected = clienteRegistro.selectedOptions[0];
+                const veiculos = selected?.dataset.veiculos ? JSON.parse(selected.dataset.veiculos) : [];
+                veiculoRegistro.innerHTML = '';
+                if (!veiculos.length) {
+                    veiculoRegistro.disabled = true;
+                    veiculoRegistro.innerHTML = '<option value="">Nenhum veículo cadastrado</option>';
+                    return;
+                }
+                veiculoRegistro.disabled = false;
+                veiculoRegistro.insertAdjacentHTML('beforeend', '<option value="">Selecione o veículo</option>');
+                veiculos.forEach((veiculo) => {
+                    const option = document.createElement('option');
+                    option.value = veiculo.placa;
+                    option.textContent = veiculo.rotulo;
+                    veiculoRegistro.appendChild(option);
+                });
+            });
+        }
     </script>
 </body>
 </html>

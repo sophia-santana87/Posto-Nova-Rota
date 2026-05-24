@@ -1,17 +1,6 @@
 {
     "sqltools.connections": [
         {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5433,
-            "driver": "PostgreSQL",
-            "name": "chatbotGI2026",
-            "database": "chatbotGI2026",
-            "username": "postgres",
-            "password": "Fl@qu1nh@"
-        },
-        {
             "mysqlOptions": {
                 "authProtocol": "default",
                 "enableSsl": "Disabled"

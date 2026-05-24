@@ -1,0 +1,262 @@
+/* Regras globais de responsividade do site Nova Rota. */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 1180px) {
+    .site-nav,
+    .page-nav {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        min-height: 0 !important;
+        padding: 18px !important;
+    }
+
+    .site-nav .brand,
+    .page-nav .brand {
+        justify-self: center;
+    }
+
+    .site-nav .nav-links,
+    .page-nav .nav-links {
+        position: static !important;
+        transform: none !important;
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px 18px;
+        width: 100%;
+    }
+
+    .site-nav .nav-actions,
+    .page-nav .nav-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .hero-content,
+    .access-card,
+    .reset-access-card,
+    .contact-layout,
+    .service-detail {
+        grid-template-columns: 1fr !important;
+    }
+
+    .contact-layout {
+        gap: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .section,
+    .page-section,
+    .service-band .section {
+        width: 100%;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .brand img,
+    .login-brand img {
+        width: 72px !important;
+    }
+
+    .brand-name,
+    .login-brand span {
+        font-size: 15px !important;
+    }
+
+    .nav-links a {
+        font-size: 13px !important;
+        letter-spacing: 0 !important;
+    }
+
+    .nav-actions {
+        width: 100%;
+    }
+
+    .nav-actions .btn {
+        flex: 1 1 150px;
+        min-width: 0;
+    }
+
+    .hero-copy h1,
+    .section-title,
+    .esg-hero-panel h1,
+    .contact-intro h1,
+    .about-hero-panel h1,
+    .service-detail h1 {
+        font-size: 2rem !important;
+        line-height: 1.12 !important;
+    }
+
+    .hero-copy h2,
+    .contact-intro p:not(.eyebrow),
+    .esg-hero-panel p:not(.eyebrow),
+    .about-hero-panel p,
+    .service-detail-copy > p:not(.eyebrow) {
+        font-size: 1rem !important;
+    }
+
+    .service-grid,
+    .service-grid.services-three,
+    .esg-pillars,
+    .about-pillars,
+    .feature-grid,
+    .about-values,
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .esg-page,
+    .about-page {
+        gap: 18px !important;
+    }
+
+    .esg-hero-panel,
+    .esg-statement,
+    .about-hero-panel,
+    .about-text-panel,
+    .esg-pillar,
+    .about-pillars article {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+    }
+
+    .esg-hero-panel h1,
+    .esg-statement h2,
+    .about-hero-panel h1,
+    .esg-pillar h2,
+    .about-pillars span {
+        overflow-wrap: anywhere;
+        letter-spacing: 0 !important;
+    }
+
+    .esg-statement h2,
+    .esg-pillar h2 {
+        font-size: 1.35rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .esg-pillar span {
+        margin-bottom: 14px !important;
+    }
+
+    .esg-statement p,
+    .esg-pillar p,
+    .about-text-panel p,
+    .about-pillars p {
+        max-width: 100% !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+        overflow-wrap: anywhere;
+    }
+
+    .service-card {
+        min-height: 0 !important;
+    }
+
+    .service-card img,
+    .service-detail-image,
+    .service-detail > img {
+        max-height: 280px;
+        object-fit: cover;
+    }
+
+    .contact-form,
+    .contact-side,
+    .access-card,
+    .about-hero-panel,
+    .about-text-panel {
+        padding: 20px !important;
+        border-radius: 8px !important;
+    }
+
+    .access-page {
+        min-height: auto !important;
+        padding: 18px !important;
+    }
+
+    .access-options {
+        grid-template-columns: 1fr !important;
+    }
+
+    .site-footer {
+        padding: 18px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-nav,
+    .page-nav {
+        padding: 14px !important;
+    }
+
+    .nav-links {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nav-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        text-align: center;
+    }
+
+    .nav-actions .btn,
+    .contact-form .btn,
+    .access-card .btn {
+        width: 100% !important;
+    }
+
+    .hero-copy h1,
+    .section-title,
+    .esg-hero-panel h1,
+    .contact-intro h1,
+    .about-hero-panel h1,
+    .service-detail h1 {
+        font-size: 1.65rem !important;
+    }
+
+    .esg-statement h2,
+    .esg-pillar h2 {
+        font-size: 1.15rem !important;
+    }
+
+    .esg-hero-panel,
+    .esg-statement,
+    .about-hero-panel,
+    .about-text-panel,
+    .esg-pillar,
+    .about-pillars article {
+        padding: 16px !important;
+    }
+
+    .content-panel,
+    .metric-card,
+    .chart-card {
+        padding: 16px !important;
+    }
+}

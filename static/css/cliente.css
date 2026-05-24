@@ -1,0 +1,416 @@
+/* Dashboard do cliente: usa a mesma base visual dos painéis internos. */
+.customer-dashboard .app-layout {
+    min-height: 100vh;
+    background:
+        linear-gradient(180deg, rgba(7, 17, 31, 0.88), rgba(9, 31, 55, 0.72)),
+        url("/static/img/hero-nova-rota.png") center center / cover fixed no-repeat,
+        radial-gradient(circle at top right, rgba(51, 182, 120, 0.08), transparent 30%);
+}
+
+.customer-dashboard .sidebar.client {
+    background: linear-gradient(180deg, #061c32 0%, #07365e 54%, #084f72 100%);
+}
+
+.customer-dashboard .app-main {
+    min-width: 0;
+}
+
+.customer-dashboard .dashboard {
+    display: grid;
+    gap: 22px;
+}
+
+.customer-tab-panel {
+    display: none;
+}
+
+.customer-tab-panel.active {
+    display: grid;
+    gap: 22px;
+}
+
+.customer-dashboard .topbar,
+.customer-dashboard .metric-card,
+.customer-dashboard .content-panel {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 1px solid rgba(97, 183, 255, 0.18) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: blur(6px);
+}
+
+.customer-dashboard .topbar {
+    height: auto;
+    min-height: 88px;
+}
+
+.customer-dashboard .topbar h1 {
+    color: #0f172a !important;
+    line-height: 1.2;
+}
+
+.customer-dashboard .topbar > span {
+    color: #053b86 !important;
+    background: #eff6ff !important;
+    border: 1px solid #dbeafe !important;
+}
+
+.customer-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.customer-panel {
+    width: 100%;
+    overflow: hidden;
+}
+
+.customer-alert {
+    margin: 0 0 20px;
+}
+
+.period-filter {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid rgba(97, 183, 255, 0.18);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.period-filter label {
+    display: grid;
+    gap: 6px;
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.period-filter select {
+    min-width: 220px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #c9d9eb;
+    border-radius: 8px;
+    background: #f8fbff;
+    color: #0f172a;
+    font: inherit;
+}
+
+.customer-summary {
+    display: grid;
+    gap: 18px;
+}
+
+.customer-overview-chart {
+    display: grid;
+    gap: 18px;
+}
+
+.overview-bars {
+    display: grid;
+    gap: 14px;
+}
+
+.overview-bar {
+    display: grid;
+    grid-template-columns: minmax(120px, 220px) 1fr 48px;
+    gap: 14px;
+    align-items: center;
+}
+
+.overview-bar span,
+.overview-bar strong {
+    color: #0f172a;
+    font-weight: 900;
+}
+
+.overview-bar div {
+    height: 18px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.overview-bar i {
+    display: block;
+    height: 100%;
+    min-width: 8px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0b6ff3, #12b981);
+}
+
+.usage-list {
+    display: grid;
+    gap: 14px;
+}
+
+.customer-summary-layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+}
+
+.customer-pie {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 230px);
+    aspect-ratio: 1;
+    justify-self: center;
+    border-radius: 50%;
+    background: conic-gradient(#0b6ff3 0 var(--s1), #12b981 var(--s1) var(--s2), #ffbf45 var(--s2) var(--s3), #ef6351 var(--s3) 100%);
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08), 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
+.customer-pie::after {
+    content: "";
+    position: absolute;
+    inset: 34px;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.customer-pie span {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    color: #0f172a;
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.customer-pie small {
+    color: #64748b;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.usage-item {
+    display: grid;
+    grid-template-columns: minmax(150px, 240px) 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
+.usage-item strong,
+.usage-item span {
+    display: block;
+}
+
+.usage-item strong {
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.usage-item span,
+.empty-state {
+    color: #64748b;
+}
+
+.usage-track {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.usage-track i {
+    display: block;
+    height: 100%;
+    min-width: 8px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0b6ff3, #12b981);
+}
+
+.boleto-showcase {
+    margin: 18px 0;
+}
+
+.boleto-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: center;
+    padding: 18px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #f8fbff;
+}
+
+.boleto-card h3 {
+    margin: 0 0 8px;
+    color: #0f172a;
+}
+
+.boleto-card p {
+    margin: 0 0 14px;
+    color: #475569;
+    line-height: 1.45;
+}
+
+.boleto-paper {
+    display: grid;
+    gap: 8px;
+    min-height: 150px;
+    padding: 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background:
+        linear-gradient(90deg, rgba(11, 111, 243, 0.1), transparent 38%),
+        #ffffff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.boleto-bank {
+    color: #053b86;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.boleto-title {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.boleto-line {
+    display: block;
+    height: 10px;
+    border-radius: 999px;
+    background: #dbeafe;
+}
+
+.boleto-line.long {
+    width: 100%;
+}
+
+.boleto-line.short {
+    width: 58%;
+}
+
+.barcode {
+    display: block;
+    height: 28px;
+    margin-top: 8px;
+    background: repeating-linear-gradient(90deg, #0f172a 0 2px, transparent 2px 5px, #0f172a 5px 8px, transparent 8px 12px);
+}
+
+.table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #e8f2ff;
+    color: #053b86;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.customer-dispute-note {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 16px;
+    align-items: center;
+    margin: 18px 0 0;
+    padding: 16px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    background: #f8fbff;
+}
+
+.customer-dispute-note strong,
+.customer-dispute-note span {
+    display: block;
+}
+
+.customer-dispute-note strong {
+    color: #0f172a;
+}
+
+.customer-dispute-note span {
+    color: #475569;
+    line-height: 1.45;
+}
+
+.customer-dispute-note .btn {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+}
+
+.customer-dashboard .table-frame {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.customer-dashboard .table {
+    min-width: 720px;
+    background: #fff;
+}
+
+.customer-dashboard .table th,
+.customer-dashboard .table td {
+    color: #0f172a;
+}
+
+.customer-dashboard .table th {
+    color: #475569;
+    font-weight: 900;
+}
+
+@media (max-width: 1200px) {
+    .customer-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .customer-dashboard .topbar {
+        align-items: flex-start !important;
+    }
+
+    .period-filter {
+        display: grid;
+        align-items: stretch;
+    }
+
+    .period-filter label,
+    .period-filter select,
+    .period-filter .btn {
+        width: 100%;
+    }
+
+    .customer-metrics {
+        grid-template-columns: 1fr !important;
+    }
+
+    .usage-item,
+    .customer-summary-layout,
+    .overview-bar,
+    .boleto-card {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-dispute-note {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-dispute-note .btn {
+        grid-row: auto;
+        grid-column: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .customer-dashboard .table {
+        min-width: 640px;
+    }
+
+    .boleto-card {
+        padding: 14px;
+    }
+}

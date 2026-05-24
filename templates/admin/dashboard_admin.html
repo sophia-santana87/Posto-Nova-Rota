@@ -5,62 +5,434 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Administrador</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-responsive.css') }}">
 </head>
 <body>
     <div class="app-layout dashboard-shell">
         <aside class="sidebar">
-            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
+            <a class="dashboard-brand" href="{{ url_for('home') }}">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
                 <span>Nova Rota</span>
             </a>
+            <button class="dashboard-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu">
+                <span></span><span></span><span></span>
+            </button>
             <nav class="side-nav">
-                <a class="active" href="{{ url_for('dashboard_admin') }}">Dashboard</a>
-                <a href="#">Clientes</a>
-                <a href="#">Boletos</a>
-                <a href="#">Serviços</a>
-                <a href="#">Faturas</a>
-                <a href="#">Veículos</a>
+                <button class="{{ 'active' if painel_ativo == 'dashboard' else '' }}" type="button" data-panel="dashboard">Dashboard</button>
+                <button class="{{ 'active' if painel_ativo == 'clientes' else '' }}" type="button" data-panel="clientes">Clientes</button>
+                <button class="{{ 'active' if painel_ativo == 'boletos' else '' }}" type="button" data-panel="boletos">Boletos</button>
+                <button class="{{ 'active' if painel_ativo == 'faturamento' else '' }}" type="button" data-panel="faturamento">Faturamento mensal</button>
+                <button class="{{ 'active' if painel_ativo == 'servicos' else '' }}" type="button" data-panel="servicos">Serviços</button>
+                <button class="{{ 'active' if painel_ativo == 'acessos' else '' }}" type="button" data-panel="acessos">Acessos</button>
+                <button class="{{ 'active' if painel_ativo == 'relatorios' else '' }}" type="button" data-panel="relatorios">Relatórios</button>
                 <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
         <main class="app-main">
             <header class="topbar">
-                <h1>Dashboard - Administrador</h1>
+                <div>
+                    <span class="topbar-kicker">Administração geral</span>
+                    <h1>Dashboard - Administrador</h1>
+                </div>
                 <span>Bem-vindo, {{ usuario.nome }}</span>
             </header>
-            <section class="dashboard">
-                <div class="metric-grid">
-                    <article class="metric-card"><small>Clientes Ativos</small><strong>{{ resumo.clientes }}</strong><span>dados do MySQL</span></article>
-                    <article class="metric-card"><small>Faturamento estimado</small><strong>R$ {{ '%.2f'|format(resumo.faturamento) }}</strong><span>serviços registrados</span></article>
-                    <article class="metric-card"><small>Boletos Pagos</small><strong>{{ resumo.boletos_pagos }}</strong><span>status PAGO</span></article>
-                    <article class="metric-card"><small>Boletos Atrasados</small><strong>{{ resumo.boletos_atrasados }}</strong><span>status ATRASADO</span></article>
-                </div>
-                <div class="dashboard-grid">
-                    <article class="chart-card">
-                        <h2>Permissões do administrador</h2>
-                        <p>O admin pode inserir, editar e excluir dados operacionais, incluindo preços e descontos, sem alterar estrutura, PK ou FK do banco.</p>
-                    </article>
-                    <article class="chart-card">
-                        <h2>Boletos por Status</h2>
-                        <div class="donut"></div>
-                        <p>Pagos, em aberto e atrasados conforme a tabela boleto.</p>
-                    </article>
-                    <article class="chart-card">
-                        <h2>Serviços mais utilizados</h2>
-                        <div class="progress-list">
-                            {% for servico in resumo.servicos %}
-                                <div class="progress-row">
-                                    <span>{{ servico.nome }}</span>
-                                    <div class="track"><i style="width:{{ servico.percentual }}%"></i></div>
-                                    <strong>{{ servico.percentual }}%</strong>
+
+            {% if mensagem %}<div class="form-success dashboard-message"><strong>{{ mensagem }}</strong></div>{% endif %}
+            {% if erro %}<div class="form-error dashboard-message"><strong>{{ erro }}</strong></div>{% endif %}
+
+            <section class="dashboard admin-workspace">
+                <div class="employee-panel {{ 'active' if painel_ativo == 'dashboard' else '' }}" data-panel-content="dashboard">
+                    <div class="metric-grid admin-metrics">
+                        <article class="metric-card"><small>Clientes Ativos</small><strong>{{ resumo.clientes }}</strong><span>MySQL</span></article>
+                        <article class="metric-card"><small>Faturamento estimado</small><strong>{{ resumo.faturamento|brl }}</strong><span>serviços registrados</span></article>
+                        <article class="metric-card"><small>Boletos Pagos</small><strong>{{ resumo.boletos_pagos }}</strong><span>status PAGO</span></article>
+                        <article class="metric-card"><small>Boletos Atrasados</small><strong>{{ resumo.boletos_atrasados }}</strong><span>status ATRASADO</span></article>
+                    </div>
+                    <div class="dashboard-grid">
+                        <article class="chart-card admin-status-card">
+                            <h2>Boletos por Status</h2>
+                            <div class="donut admin-donut"
+                                 style="--paid: {{ resumo.pct_pago }}%; --open: {{ resumo.pct_aberto }}%;"></div>
+                            <div class="status-legend admin-status-legend">
+                                <div class="status-hover paid">
+                                    <span><i></i>Pagos: {{ resumo.boletos_pagos }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_pagos %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto pago.</small>
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    </article>
+                                <div class="status-hover open">
+                                    <span><i></i>Em aberto: {{ resumo.boletos_abertos }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_abertos %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto em aberto.</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="status-hover late">
+                                    <span><i></i>Atrasados: {{ resumo.boletos_atrasados }}</span>
+                                    <div class="status-popover">
+                                        {% for boleto in boletos_atrasados %}
+                                            <strong>{{ boleto.razao_social }}</strong>
+                                            <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
+                                        {% else %}
+                                            <small>Nenhum boleto atrasado.</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <p>{{ resumo.total_boletos }} boletos no processo de faturamento.</p>
+                        </article>
+                        <article class="chart-card">
+                            <h2>Serviços mais utilizados</h2>
+                            <div class="service-usage-layout">
+                                <div class="progress-list">
+                                    {% for servico in resumo.servicos %}
+                                        <div class="progress-row">
+                                            <span>{{ servico.nome }}</span>
+                                            <div class="track"><i style="width: {{ servico.percentual }}%;"></i></div>
+                                            <strong>{{ servico.percentual }}%</strong>
+                                        </div>
+                                    {% else %}
+                                        <p class="empty-state">Nenhum serviço registrado.</p>
+                                    {% endfor %}
+                                </div>
+                                <div class="service-pie-panel" aria-label="Gráfico de pizza dos serviços mais utilizados">
+                                    {% set cores_servicos = ['#0b6ff3', '#12b981', '#ffbf45', '#ef6351', '#7c3aed'] %}
+                                    {% set grafico = namespace(inicio=0) %}
+                                    <div class="service-pie-chart"
+                                         style="background: conic-gradient({% for servico in resumo.servicos[:5] %}{{ cores_servicos[loop.index0] }} {{ grafico.inicio }}% {{ 100 if loop.last else grafico.inicio + servico.percentual }}%{% set grafico.inicio = grafico.inicio + servico.percentual %}{% if not loop.last %}, {% endif %}{% endfor %});">
+                                        <span>{{ resumo.servicos|sum(attribute='total') }}</span>
+                                    </div>
+                                    <div class="service-pie-legend">
+                                        {% for servico in resumo.servicos[:5] %}
+                                            <span><i style="background: {{ cores_servicos[loop.index0] }};"></i>{{ servico.nome }}: {{ servico.percentual }}%</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
                 </div>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'clientes' else '' }}" data-panel-content="clientes">
+                    <div class="panel-heading"><h2>Clientes</h2><p>Consulte, altere, adicione ou remova clientes.</p></div>
+                    <form method="post" class="dashboard-form compact-form add-form admin-create-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="painel" value="clientes">
+                        <input type="hidden" name="acao" value="salvar_cliente">
+                        <label><span>Novo CNPJ</span><input name="cnpj" placeholder="00000000000000" required></label>
+                        <label><span>Razão social</span><input name="razao_social" required></label>
+                        <label><span>Telefone</span><input name="telefone"></label>
+                        <label><span>E-mail</span><input name="email"></label>
+                        <label><span>CEP existente</span><input name="cep" required></label>
+                        <label class="span-2"><span>Placas do cliente</span><textarea name="placas" rows="3" required placeholder="ABC1234&#10;DEF5678 - Caminhão Volvo - 2021"></textarea></label>
+                        <label><span>Modelo padrão</span><input name="modelo_veiculo" placeholder="Modelo do veículo"></label>
+                        <label><span>Ano padrão</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ current_year }}"></label>
+                        <label><span>Número</span><input name="numero" type="number"></label>
+                        <label><span>Complemento</span><input name="complemento"></label>
+                        <button class="btn btn-highlight" type="submit">Adicionar cliente</button>
+                    </form>
+                    <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
+                        <input type="hidden" name="painel" value="clientes">
+                        <input type="search" name="cliente_busca" value="{{ filtros.cliente_busca }}" placeholder="Buscar por CNPJ, razão social ou e-mail">
+                        <button class="btn primary" type="submit">Buscar</button>
+                    </form>
+                    <div class="table-frame">
+                        <table class="table admin-action-table">
+                            <thead>
+                                <tr><th>CNPJ</th><th>Razão social</th><th>Telefone</th><th>E-mail</th><th>Veículos encontrados</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for cliente in clientes %}
+                                    <tr>
+                                        <td>{{ cliente.cnpj }}</td>
+                                        <td>{{ cliente.razao_social }}</td>
+                                        <td>{{ cliente.telefone }}</td>
+                                        <td>{{ cliente.email }}</td>
+                                        <td>{{ cliente.veiculos or cliente.placa }}</td>
+                                        <td class="row-actions">
+                                            <button class="btn primary small-btn" type="button" data-edit-target="cliente-{{ loop.index }}">Alterar</button>
+                                            <form method="post">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="painel" value="clientes">
+                                                <input type="hidden" name="acao" value="excluir_cliente">
+                                                <input type="hidden" name="cnpj" value="{{ cliente.cnpj }}">
+                                                <button class="btn danger small-btn" type="submit">Excluir</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr class="edit-row" data-edit-row="cliente-{{ loop.index }}">
+                                        <td colspan="6">
+                                            <form method="post" class="dashboard-form compact-form admin-inline-edit">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="painel" value="clientes">
+                                                <input type="hidden" name="acao" value="salvar_cliente">
+                                                <input type="hidden" name="cnpj_original" value="{{ cliente.cnpj }}">
+                                                <label><span>CNPJ</span><input name="cnpj" value="{{ cliente.cnpj }}" readonly></label>
+                                                <label><span>Razão social</span><input name="razao_social" value="{{ cliente.razao_social or '' }}" required></label>
+                                                <label><span>Telefone</span><input name="telefone" value="{{ cliente.telefone or '' }}"></label>
+                                                <label><span>E-mail</span><input name="email" value="{{ cliente.email or '' }}"></label>
+                                                <label class="span-2"><span>Placas do cliente</span><textarea name="placas" rows="3">{{ cliente.veiculos or cliente.placa }}</textarea></label>
+                                                <label><span>Modelo padrão</span><input name="modelo_veiculo" value="{{ cliente.veiculo_modelo or '' }}"></label>
+                                                <label><span>Ano padrão</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ cliente.veiculo_ano or current_year }}"></label>
+                                                <button class="btn primary" type="submit">Salvar alterações</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="6">Nenhum cliente encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'boletos' else '' }}" data-panel-content="boletos">
+                    <div class="panel-heading"><h2>Boletos</h2><p>Filtre, altere status, datas e código de barras.</p></div>
+                    <form method="post" class="dashboard-form compact-form add-form admin-create-form boleto-create-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="painel" value="boletos">
+                        <input type="hidden" name="acao" value="salvar_boleto">
+                        <label><span>Cliente e serviço</span>
+                            <select name="fatura_id" required>
+                                <option value="">Selecione o faturamento</option>
+                                {% for fatura in faturas_disponiveis %}
+                                    <option value="{{ fatura.id }}">
+                                        {{ fatura.razao_social or 'Cliente não vinculado' }} - {{ fatura.servico }} - {{ fatura.placa }}{% if fatura.data_registro %} - {{ fatura.data_registro|data_hora_br }}{% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label><span>Vencimento</span><input name="data_vencimento" type="date" required></label>
+                        <label><span>Emissão</span><input name="data_emissao" type="date" required></label>
+                        <label><span>Status</span>
+                            <select name="status_pagamento" required>
+                                <option>PAGO</option>
+                                <option>EM ABERTO</option>
+                                <option>ATRASADO</option>
+                            </select>
+                        </label>
+                        <label class="barcode-field">
+                            <span>Código de barras <small>43 ou 44 dígitos</small></span>
+                            <input name="codigo_barras" inputmode="numeric" pattern="[0-9]{43,44}" minlength="43" maxlength="44" placeholder="Digite 43 ou 44 dígitos" required>
+                        </label>
+                        <button class="btn btn-highlight" type="submit">Adicionar boleto</button>
+                    </form>
+                    <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
+                        <input type="hidden" name="painel" value="boletos">
+                        <input type="search" name="boleto_busca" value="{{ filtros.boleto_busca }}" placeholder="Buscar por cliente, CNPJ, serviço ou status">
+                        <button class="btn primary" type="submit">Buscar</button>
+                    </form>
+                    <div class="table-frame">
+                        <table class="table admin-action-table">
+                            <thead>
+                                <tr><th>Cliente</th><th>CNPJ</th><th>Veículo do serviço</th><th>Serviço</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for boleto in boletos %}
+                                    <tr>
+                                        <td>{{ boleto.razao_social }}</td>
+                                        <td>{{ boleto.cnpj }}</td>
+                                        <td>{{ boleto.placa_veiculo }}</td>
+                                        <td>{{ boleto.servico }}</td>
+                                        <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                                        <td><span class="pill {{ classe_status(boleto.status_pagamento) }}">{{ boleto.status_pagamento }}</span></td>
+                                        <td class="row-actions">
+                                            <button class="btn primary small-btn" type="button" data-edit-target="boleto-{{ loop.index }}">Alterar</button>
+                                            <form method="post">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="painel" value="boletos">
+                                                <input type="hidden" name="acao" value="excluir_boleto">
+                                                <input type="hidden" name="boleto_id" value="{{ boleto.id_Boleto }}">
+                                                <button class="btn danger small-btn" type="submit">Excluir</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr class="edit-row" data-edit-row="boleto-{{ loop.index }}">
+                                        <td colspan="7">
+                                            <form method="post" class="dashboard-form compact-form admin-inline-edit boleto-inline-edit">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="painel" value="boletos">
+                                                <input type="hidden" name="acao" value="salvar_boleto">
+                                                <input type="hidden" name="boleto_id" value="{{ boleto.id_Boleto }}">
+                                                <label><span>Cliente</span><input value="{{ boleto.razao_social }}" readonly></label>
+                                                <label><span>Serviço</span><input value="{{ boleto.servico }}" readonly></label>
+                                                <label><span>Vencimento</span><input name="data_vencimento" type="date" value="{{ boleto.data_vencimento }}" required></label>
+                                                <label><span>Emissão</span><input name="data_emissao" type="date" value="{{ boleto.data_emissao }}" required></label>
+                                                <label><span>Status</span>
+                                                    <select name="status_pagamento" required>
+                                                        {% for status in ['PAGO', 'EM ABERTO', 'ATRASADO'] %}
+                                                            <option value="{{ status }}" {% if boleto.status_pagamento == status %}selected{% endif %}>{{ status }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </label>
+                                                <label class="barcode-field">
+                                                    <span>Código de barras <small>43 ou 44 dígitos</small></span>
+                                                    <input name="codigo_barras" value="{{ boleto.codigo_barras or '' }}" inputmode="numeric" pattern="[0-9]{43,44}" minlength="43" maxlength="44" placeholder="Digite 43 ou 44 dígitos" required>
+                                                </label>
+                                                <button class="btn primary" type="submit">Salvar alterações</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="7">Nenhum boleto encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'faturamento' else '' }}" data-panel-content="faturamento">
+                    <div class="panel-heading"><h2>Faturamento mensal</h2><p>Resumo por cliente antes da geracao dos boletos.</p></div>
+                    <form class="admin-search monthly-filter-form" method="get" action="{{ url_for('dashboard_admin') }}">
+                        <input type="hidden" name="painel" value="faturamento">
+                        <input type="search" name="faturamento_busca" value="{{ filtros.faturamento_busca }}" placeholder="Buscar por cliente ou CNPJ">
+                        <input type="month" name="competencia" value="{{ filtros.competencia }}">
+                        <button class="btn primary" type="submit">Filtrar</button>
+                    </form>
+                    <div class="monthly-summary-grid">
+                        {% for mensal in resumos_mensais %}
+                            <section class="monthly-summary-card">
+                                <div class="monthly-summary-head">
+                                    <div>
+                                        <h3>{{ mensal.razao_social }}</h3>
+                                        <span>{{ mensal.competencia_label }} - {{ mensal.total_servicos }} servico(s)</span>
+                                    </div>
+                                    <strong>{{ mensal.total_mes|brl }}</strong>
+                                </div>
+                                <div class="monthly-summary-items">
+                                    {% for item in mensal.itens %}
+                                        <div>
+                                            <span>{{ item.servico }}</span>
+                                            <small>{{ item.quantidade }} un. - {{ item.subtotal|brl }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="monthly-summary-footer">
+                                    <span>{{ mensal.faturas_sem_boleto or 0 }} pendente(s) / {{ mensal.faturas_com_boleto or 0 }} com boleto</span>
+                                    <form method="post" class="monthly-generate-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="painel" value="faturamento">
+                                        <input type="hidden" name="acao" value="gerar_boletos_mensais">
+                                        <input type="hidden" name="cnpj" value="{{ mensal.cnpj }}">
+                                        <input type="hidden" name="competencia" value="{{ mensal.competencia }}">
+                                        <input name="vencimento" type="date" value="{{ vencimento_padrao }}" required>
+                                        <button class="btn btn-highlight small-btn" type="submit" {% if not mensal.faturas_sem_boleto %}disabled{% endif %}>Gerar boleto</button>
+                                    </form>
+                                </div>
+                            </section>
+                        {% else %}
+                            <p class="empty-state">Nenhum servico mensal encontrado.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'servicos' else '' }}" data-panel-content="servicos">
+                    <div class="panel-heading"><h2>Serviços e preços</h2><p>Cadastre, altere e exclua valores dos serviços.</p></div>
+                    <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
+                        <input type="hidden" name="painel" value="servicos">
+                        <input type="search" name="servico_busca" value="{{ filtros.servico_busca }}" placeholder="Buscar por nome ou descrição">
+                        <button class="btn primary" type="submit">Buscar</button>
+                    </form>
+                    <div class="admin-service-grid">
+                        {% for servico in precos %}
+                            <form method="post" class="dashboard-form compact-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="painel" value="servicos">
+                                <input type="hidden" name="acao" value="salvar_servico">
+                                <input type="hidden" name="servico_id" value="{{ servico.id }}">
+                                <label><span>Nome</span><input name="nome" value="{{ servico.nome }}" required></label>
+                                <label><span>Descrição</span><input name="descricao" value="{{ servico.descricao }}" required></label>
+                                <label><span>Valor unitário</span><input name="valor_unitario" type="number" step="0.01" value="{{ servico.valor_unitario }}" required></label>
+                                <label><span>Desconto</span><input name="desconto" type="number" step="0.01" value="{{ servico.desconto or 0 }}"></label>
+                                <div class="form-actions">
+                                    <button class="btn primary" type="submit">Alterar</button>
+                                    <button class="btn danger" name="acao" value="excluir_servico" type="submit">Excluir</button>
+                                </div>
+                            </form>
+                        {% endfor %}
+                        <form method="post" class="dashboard-form compact-form add-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="painel" value="servicos">
+                            <input type="hidden" name="acao" value="salvar_servico">
+                            <label><span>Novo serviço</span><input name="nome" required></label>
+                            <label><span>Descrição</span><input name="descricao" required></label>
+                            <label><span>Valor unitário</span><input name="valor_unitario" type="number" step="0.01" required></label>
+                            <label><span>Desconto</span><input name="desconto" type="number" step="0.01" value="0"></label>
+                            <button class="btn btn-highlight" type="submit">Adicionar</button>
+                        </form>
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'acessos' else '' }}" data-panel-content="acessos">
+                    <div class="panel-heading"><h2>Acessos</h2><p>Últimos registros do log de acesso do sistema.</p></div>
+                    <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
+                        <input type="hidden" name="painel" value="acessos">
+                        <input type="search" name="acesso_busca" value="{{ filtros.acesso_busca }}" placeholder="Buscar no log">
+                        <button class="btn primary" type="submit">Buscar</button>
+                    </form>
+                    <div class="access-log">
+                        {% for linha in acessos %}
+                            <code>{{ linha }}</code>
+                        {% else %}
+                            <p class="empty-state">Nenhum acesso registrado.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+
+                <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'relatorios' else '' }}" data-panel-content="relatorios">
+                    <div class="panel-heading">
+                        <h2>Relatórios</h2>
+                        <p>Exportações separadas por clientes, boletos, serviços e movimentações administrativas.</p>
+                    </div>
+                    <div class="report-card-grid">
+                        <section class="report-card">
+                            <h3>Relatório completo</h3>
+                            <p>Inclui clientes existentes, clientes criados, clientes editados, boletos por situação, serviços prestados e atualizações de serviços.</p>
+                            <div class="report-downloads">
+                                <a class="btn primary" href="{{ url_for('exportar_relatorio', perfil='admin', formato='csv') }}">CSV</a>
+                                <a class="btn" href="{{ url_for('exportar_relatorio', perfil='admin', formato='pdf') }}">PDF</a>
+                            </div>
+                        </section>
+                    </div>
+                </article>
             </section>
         </main>
     </div>
+    <script>
+        document.querySelectorAll('[data-panel]').forEach((button) => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('[data-panel]').forEach((item) => item.classList.remove('active'));
+                document.querySelectorAll('[data-panel-content]').forEach((panel) => panel.classList.remove('active'));
+                button.classList.add('active');
+                document.querySelector(`[data-panel-content="${button.dataset.panel}"]`).classList.add('active');
+                document.querySelector('.sidebar')?.classList.remove('nav-open');
+                document.querySelector('.dashboard-menu-toggle')?.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
+            const sidebar = event.currentTarget.closest('.sidebar');
+            const aberto = sidebar.classList.toggle('nav-open');
+            event.currentTarget.setAttribute('aria-expanded', String(aberto));
+        });
+
+        document.querySelectorAll('[data-edit-target]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const row = document.querySelector(`[data-edit-row="${button.dataset.editTarget}"]`);
+                if (row) {
+                    row.classList.toggle('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

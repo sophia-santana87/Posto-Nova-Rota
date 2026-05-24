@@ -5,47 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Cliente</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>{{ inline_css|safe }}</style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
-<body>
-    <main class="client-shell dashboard-shell">
+<body class="customer-dashboard">
+    <div class="app-layout dashboard-shell">
         <aside class="sidebar client">
-            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
+            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a pagina principal">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
                 <span>Nova Rota</span>
             </a>
+            <button class="dashboard-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu">
+                <span></span><span></span><span></span>
+            </button>
+
             <nav class="side-nav">
-                <a class="active" href="{{ url_for('dashboard_cliente') }}">Início</a>
-                <a href="#">Meus Boletos</a>
-                <a href="#">Meus Serviços</a>
-                <a href="#">Meu Perfil</a>
+                <button class="active" type="button" data-customer-panel="inicio">Início</button>
+                <button type="button" data-customer-panel="resumo">Resumo</button>
+                <button type="button" data-customer-panel="boletos">Meus Boletos</button>
+                <button type="button" data-customer-panel="servicos">Meus Serviços</button>
+                <button type="button" data-customer-panel="relatorios">Relatórios</button>
                 <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
-        <section class="client-content">
-            <p><strong>Olá, {{ usuario.nome }}</strong><br><small>CNPJ: {{ usuario.identificador }}</small></p>
+
+        <main class="app-main">
+            <header class="topbar">
+                <div>
+                    <span class="topbar-kicker">Área do Cliente</span>
+                    <h1>{{ usuario.nome }}</h1>
+                </div>
+                <span>CNPJ {{ usuario.identificador }}</span>
+            </header>
+
             {% if boleto_aberto %}
-                <div class="alert">Atenção! Você possui boleto em aberto com vencimento para {{ boleto_aberto.data_vencimento.strftime('%d/%m/%Y') }}.</div>
+                <div class="alert customer-alert">
+                    Atenção: você possui boleto em aberto com vencimento para {{ boleto_aberto.data_vencimento.strftime('%d/%m/%Y') }}.
+                </div>
             {% endif %}
-            <article class="content-panel">
-                <h1>Seus boletos</h1>
-                <table class="table">
-                    <thead><tr><th>Vencimento</th><th>Descrição</th><th>Valor</th><th>Status</th></tr></thead>
-                    <tbody>
-                        {% for boleto in boletos %}
-                            <tr>
-                                <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
-                                <td>{{ boleto.servico }}</td>
-                                <td>R$ {{ '%.2f'|format(boleto.valor) }}</td>
-                                <td><span class="pill">{{ boleto.status_pagamento }}</span></td>
-                            </tr>
-                        {% else %}
-                            <tr><td colspan="4">Nenhum boleto encontrado para este cliente.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </article>
-        </section>
-    </main>
+            <section class="dashboard customer-workspace">
+                <div class="customer-tab-panel active" data-customer-content="inicio">
+                    <form class="period-filter" method="get" action="{{ url_for('dashboard_cliente') }}">
+                        <label for="periodo">Período de análise</label>
+                        <select id="periodo" name="periodo" onchange="this.form.submit()">
+                            {% for chave, item in periodos.items() %}
+                                <option value="{{ chave }}" {% if chave == periodo_atual %}selected{% endif %}>{{ item.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn primary" type="submit">Aplicar</button>
+                    </form>
+
+                    <div class="metric-grid customer-metrics">
+                        <article class="metric-card">
+                            <small>Gasto no período</small>
+                            <strong>{{ resumo.total_gasto|brl }}</strong>
+                            <span>{{ periodo_label }}</span>
+                        </article>
+                        <article class="metric-card">
+                            <small>Serviços utilizados</small>
+                            <strong>{{ resumo.total_quantidade|int }}</strong>
+                            <span>{{ servicos|length }} registros localizados</span>
+                        </article>
+                        <article class="metric-card">
+                            <small>Ticket médio</small>
+                            <strong>{{ resumo.ticket_medio|brl }}</strong>
+                            <span>média por unidade/serviço</span>
+                        </article>
+                        <article class="metric-card">
+                            <small>Em aberto</small>
+                            <strong>{{ resumo.valor_em_aberto|brl }}</strong>
+                            <span>{{ resumo.boletos_abertos }} boleto(s) pendente(s)</span>
+                        </article>
+                    </div>
+
+                    <article class="content-panel customer-panel customer-overview-chart">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Consumo no período</h2>
+                                <p>Distribuição dos serviços mais utilizados.</p>
+                            </div>
+                        </div>
+                        <div class="overview-bars">
+                            {% for item in resumo.servicos_populares %}
+                                <div class="overview-bar">
+                                    <span>{{ item.nome }}</span>
+                                    <div><i style="width: {{ item.percentual }}%;"></i></div>
+                                    <strong>{{ item.total|int }}</strong>
+                                </div>
+                            {% else %}
+                                <p class="empty-state">Nenhum serviço registrado neste período.</p>
+                            {% endfor %}
+                        </div>
+                    </article>
+                </div>
+
+                <article class="content-panel customer-panel customer-summary customer-tab-panel" data-customer-content="resumo" id="resumo">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Serviços mais utilizados</h2>
+                            <p>Resumo do consumo para {{ periodo_label|lower }}.</p>
+                        </div>
+                    </div>
+                    <div class="customer-summary-layout">
+                        <div class="customer-pie"
+                             style="--s1: {{ resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0 }}%; --s2: {{ ((resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0) + (resumo.servicos_populares[1].participacao if resumo.servicos_populares|length > 1 else 0)) }}%; --s3: {{ ((resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0) + (resumo.servicos_populares[1].participacao if resumo.servicos_populares|length > 1 else 0) + (resumo.servicos_populares[2].participacao if resumo.servicos_populares|length > 2 else 0)) }}%;">
+                            <span>{{ resumo.total_quantidade|int }}<small>usos</small></span>
+                        </div>
+                        <div class="usage-list">
+                            {% for item in resumo.servicos_populares %}
+                                <div class="usage-item">
+                                    <div>
+                                        <strong>{{ item.nome }}</strong>
+                                        <span>{{ item.total|int }} uso(s) - {{ item.participacao }}%</span>
+                                    </div>
+                                    <div class="usage-track"><i style="width: {{ item.percentual }}%;"></i></div>
+                                </div>
+                            {% else %}
+                                <p class="empty-state">Nenhum serviço registrado neste período.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </article>
+
+                <article class="content-panel customer-panel customer-tab-panel" data-customer-content="boletos" id="boletos">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Seus boletos</h2>
+                            <p>Consulta restrita ao CNPJ logado.</p>
+                        </div>
+                    </div>
+                    <div class="boleto-showcase" id="boleto-demo">
+                        <div class="boleto-card">
+                            <div class="boleto-paper" aria-hidden="true">
+                                <span class="boleto-bank">Nova Rota</span>
+                                <span class="boleto-title">Demonstrativo de boleto</span>
+                                <span class="boleto-line long"></span>
+                                <span class="boleto-line"></span>
+                                <span class="boleto-line short"></span>
+                                <span class="barcode"></span>
+                            </div>
+                            <div>
+                                <h3>Arquivo de demonstração</h3>
+                                <p>Use o botão de visualizar para simular a abertura do boleto vinculado ao cliente.</p>
+                                <a class="btn primary" href="#boleto-demo">Visualizar boleto</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-frame">
+                        <table class="table employee-table">
+                            <thead>
+                                <tr>
+                                    <th>Vencimento</th>
+                                    <th>Serviço</th>
+                                    <th>Valor base</th>
+                                    <th>Status</th>
+                                    <th>Arquivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for boleto in boletos %}
+                                    <tr>
+                                        <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ boleto.servico }}</td>
+                                        <td>{{ boleto.valor_unitario|brl }}</td>
+                                        <td><span class="pill {{ classe_status(boleto.status_pagamento) }}">{{ boleto.status_pagamento }}</span></td>
+                                        <td><a class="table-action" href="#boleto-demo">Visualizar</a></td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="5">Nenhum boleto encontrado para este cliente.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="content-panel customer-panel customer-tab-panel" data-customer-content="servicos" id="servicos">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Serviços utilizados</h2>
+                            <p>Histórico dos serviços registrados para sua empresa.</p>
+                        </div>
+                    </div>
+                    <div class="table-frame">
+                        <table class="table employee-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Serviço</th>
+                                    <th>Quantidade</th>
+                                    <th>Valor unitario</th>
+                                    <th>Desconto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for servico in servicos %}
+                                    <tr>
+                                        <td>{{ servico.data_registro|data_hora_br }}</td>
+                                        <td>{{ servico.nome }}</td>
+                                        <td>{{ servico.qunt_utilizada }}</td>
+                                        <td>{{ servico.valor_unitario|brl }}</td>
+                                        <td>{{ servico.desconto|brl }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="5">Nenhum serviço encontrado para este cliente.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="customer-dispute-note">
+                        <strong>Observou algum dado incorreto ou divergente?</strong>
+                        <span>Entre em contato com a equipe para revisarmos boletos, serviços ou valores vinculados ao seu CNPJ.</span>
+                        <a class="btn primary" href="{{ url_for('contato') }}">Preencher formulário</a>
+                    </div>
+                </article>
+
+                <article class="content-panel customer-panel customer-tab-panel" data-customer-content="relatorios" id="relatorios">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Relatórios</h2>
+                            <p>Exportação dos boletos e serviços vinculados ao seu CNPJ.</p>
+                        </div>
+                    </div>
+                    <div class="report-card-grid">
+                        <section class="report-card">
+                            <h3>Meu relatório</h3>
+                            <p>Separado por boletos em aberto, pagos, atrasados e serviços utilizados.</p>
+                            <div class="report-downloads">
+                                <a class="btn primary" href="{{ url_for('exportar_relatorio', perfil='cliente', formato='csv') }}">CSV</a>
+                                <a class="btn" href="{{ url_for('exportar_relatorio', perfil='cliente', formato='pdf') }}">PDF</a>
+                            </div>
+                        </section>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+    <script>
+        document.querySelectorAll('[data-customer-panel]').forEach((button) => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('[data-customer-panel]').forEach((item) => item.classList.remove('active'));
+                document.querySelectorAll('[data-customer-content]').forEach((panel) => panel.classList.remove('active'));
+                button.classList.add('active');
+                document.querySelector(`[data-customer-content="${button.dataset.customerPanel}"]`).classList.add('active');
+                document.querySelector('.sidebar')?.classList.remove('nav-open');
+                document.querySelector('.dashboard-menu-toggle')?.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
+            const sidebar = event.currentTarget.closest('.sidebar');
+            const aberto = sidebar.classList.toggle('nav-open');
+            event.currentTarget.setAttribute('aria-expanded', String(aberto));
+        });
+    </script>
 </body>
 </html>
