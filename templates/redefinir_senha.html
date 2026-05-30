@@ -1,3 +1,4 @@
+<!-- Fluxo de redefinicao de senha do cliente por CNPJ e confirmacao de e-mail. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -9,6 +10,7 @@
 </head>
 <body>
     <main class="access-page">
+        <!-- Tela de recuperacao demonstrativa, controlada por etapas no app.py. -->
         <section class="access-card reset-access-card">
             <div>
                 <a class="login-brand" href="{{ url_for('home') }}">
@@ -19,9 +21,12 @@
                 <p>Primeiro informe o CNPJ. Depois confirme o e-mail cadastrado, como em uma validacao de acesso.</p>
             </div>
 
+            <!-- O formulario reaproveita a mesma rota e muda o conteudo pela variavel etapa. -->
             <form class="login-card" method="post">
+                <!-- Token CSRF obrigatorio para formularios POST. -->
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+                <!-- Mensagem de sucesso exibida depois que o e-mail e validado. -->
                 {% if enviado %}
                     <div class="form-success">
                         <strong>Solicitacao validada.</strong>
@@ -29,6 +34,7 @@
                     </div>
                 {% endif %}
 
+                <!-- Mensagem de erro enviada pela rota quando CNPJ/e-mail nao conferem. -->
                 {% if erro %}
                     <div class="form-error">
                         <strong>Atencao:</strong>
@@ -36,6 +42,7 @@
                     </div>
                 {% endif %}
 
+                <!-- Etapa 2: usuario confirma o e-mail completo do cadastro. -->
                 {% if etapa == 'confirmar' %}
                     <input type="hidden" name="etapa" value="confirmar">
                     <input type="hidden" name="cnpj" value="{{ cnpj }}">
@@ -46,10 +53,12 @@
                         <span>Digite o e-mail completo</span>
                         <input type="email" name="email_confirmacao" placeholder="email@empresa.com" required>
                     </label>
+                <!-- Etapa final: orienta voltar ao login. -->
                 {% elif etapa == 'concluido' %}
                     <input type="hidden" name="etapa" value="cnpj">
                     <h2>Acesso recuperado</h2>
                     <p class="reset-hint">Agora volte ao login do cliente e entre com o CNPJ informado.</p>
+                <!-- Etapa inicial: usuario informa apenas o CNPJ. -->
                 {% else %}
                     <input type="hidden" name="etapa" value="cnpj">
                     <label class="form-field">
@@ -58,6 +67,7 @@
                     </label>
                 {% endif %}
 
+                <!-- Botao muda entre link e submit conforme a etapa atual. -->
                 {% if etapa == 'concluido' %}
                     <a class="btn login-submit" href="{{ url_for('login', tipo='cliente') }}">Voltar ao login</a>
                 {% else %}
@@ -69,6 +79,7 @@
                 <p class="center-note"><a href="{{ url_for('login', tipo='cliente') }}">Voltar ao login</a></p>
             </form>
         </section>
+        <!-- Inclui o rodape compartilhado. -->
         {% include '_footer.html' %}
     </main>
 </body>

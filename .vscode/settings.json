@@ -11,10 +11,11 @@
             "port": 3306,
             "driver": "MySQL",
             "name": "Local instance MySQL80",
-            "database": "der_trabalho_bdii",
+            "database": "rota_facil",
             "username": "root",
             "password": "Fl@qu1nh@"
         }
     ],
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "html.validate.styles": false
 }

@@ -1,3 +1,4 @@
+<!-- Pagina publica que conta a historia, os valores e a proposta da empresa. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
+    <!-- Navegacao padrao das paginas internas publicas. -->
     <nav class="page-nav">
         <a class="brand dark" href="{{ url_for('home') }}">
             <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
@@ -26,18 +28,21 @@
     </nav>
 
     <main class="section page-section about-page">
+        <!-- Bloco de abertura institucional. -->
         <section class="about-hero-panel">
             <p class="eyebrow">Sobre a Nova Rota</p>
             <h1>Mais que um posto, uma operação pensada para facilitar o seu dia.</h1>
             <p>Unimos abastecimento, serviços automotivos e tecnologia para entregar uma experiência mais prática, transparente e confiável para clientes, empresas e frotas.</p>
         </section>
 
+        <!-- Texto explicativo sobre posicionamento e proposito do posto. -->
         <section class="about-text-panel">
             <p>Nosso posto nasceu com o propósito de oferecer mais do que abastecimento: proporcionamos confiança, praticidade e uma experiência positiva para cada cliente.</p>
             <p>Tempo e economia fazem diferença, por isso unimos qualidade, atendimento acessível e preços justos.</p>
             <p>Valorizamos nossa comunidade e trabalhamos para sermos referência em custo-benefício, transparência e excelência no serviço.</p>
         </section>
 
+        <!-- Cards curtos com missao, visao e valores. -->
         <section class="about-pillars">
             <article>
                 <span>Missão</span>
@@ -53,6 +58,7 @@
             </article>
         </section>
     </main>
+    <!-- Inclui o rodape compartilhado. -->
     {% include '_footer.html' %}
 </body>
 </html>

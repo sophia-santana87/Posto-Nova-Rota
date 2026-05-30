@@ -1,3 +1,4 @@
+<!-- Pagina simples exibida quando ocorre um erro tratado pela aplicacao. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,16 +9,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
+    <!-- Pagina generica para erros 404 e 500 enviados pelo app.py. -->
     <main class="section page-section">
         <section class="about-hero-panel">
-            <p class="eyebrow">RotaFacil</p>
+            <!-- A variavel erro vem dos handlers not_found() e internal_error(). -->
+            <p class="eyebrow">RotaFácil</p>
             <h1>{{ erro }}</h1>
-            <p>Volte para a pagina inicial ou tente acessar novamente em instantes.</p>
+            <p>Volte para a página inicial ou tente acessar novamente em instantes.</p>
             <div class="hero-buttons">
-                <a class="btn btn-highlight" href="{{ url_for('home') }}">Voltar ao inicio</a>
+                <a class="btn btn-highlight" href="{{ url_for('home') }}">Voltar ao início</a>
             </div>
         </section>
     </main>
+    <!-- Inclui o rodape compartilhado. -->
     {% include '_footer.html' %}
 </body>
 </html>

@@ -1,3 +1,4 @@
+<!-- Detalhes publicos das opcoes de estacionamento oferecidas pelo posto. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,34 +9,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
+    <!-- Navegacao padrao das paginas internas publicas. -->
     <nav class="page-nav">
         <a class="brand dark" href="{{ url_for('home') }}">
             <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
             <span class="brand-name">Nova Rota</span>
         </a>
         <div class="nav-links dark">
-            <a href="{{ url_for('servicos') }}">Servicos</a>
+            <a href="{{ url_for('servicos') }}">Serviços</a>
             <a href="{{ url_for('esg') }}">ESG</a>
-            <a href="{{ url_for('sobre') }}">Sobre Nos</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
             <a href="{{ url_for('contato') }}">Contato</a>
         </div>
         <div class="nav-actions">
             <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
-            <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Area do Cliente</a>
+            <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
         </div>
     </nav>
 
     <main class="section page-section">
+        <!-- Pagina de detalhe dos planos de estacionamento. -->
         <section class="service-detail">
             <img class="service-detail-image estacionamento-focus" src="{{ url_for('static', filename='img/servico-estacionamento.png') }}" alt="Estacionamento Nova Rota">
             <div class="service-detail-copy">
-                <p class="eyebrow">Servico Nova Rota</p>
+                <p class="eyebrow">Serviço Nova Rota</p>
                 <h1>Estacionamento</h1>
-                <p>Praticidade, controle e seguranca para quem precisa estacionar por pouco tempo ou manter uma vaga recorrente.</p>
+                <p>Praticidade, controle e segurança para quem precisa estacionar por pouco tempo ou manter uma vaga recorrente.</p>
 
+                <!-- Lista dinamica recebida de SERVICOS_DETALHADOS['estacionamento'] no app.py. -->
                 <section class="fuel-section">
                     <h2>Modalidades</h2>
                     <div class="fuel-grid">
+                        <!-- Cada item possui nome, descricao, unidade e preco. -->
                         {% for item in itens %}
                             <article>
                                 <strong>{{ item.nome }}</strong>
@@ -47,11 +52,12 @@
                 </section>
 
                 <div class="hero-buttons">
-                    <a class="btn back-service" href="{{ url_for('servicos') }}">Voltar aos servicos</a>
+                    <a class="btn back-service" href="{{ url_for('servicos') }}">Voltar aos serviços</a>
                 </div>
             </div>
         </section>
     </main>
+    <!-- Inclui o rodape compartilhado. -->
     {% include '_footer.html' %}
 </body>
 </html>

@@ -1,3 +1,4 @@
+<!-- Painel do cliente: mostra dados, veiculos, consumo, boletos e relatorios. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -11,8 +12,9 @@
 </head>
 <body class="customer-dashboard">
     <div class="app-layout dashboard-shell">
+        <!-- Barra lateral do cliente; os botoes alternam os paineis da area logada. -->
         <aside class="sidebar client">
-            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a pagina principal">
+            <a class="dashboard-brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
                 <span>Nova Rota</span>
             </a>
@@ -20,35 +22,68 @@
                 <span></span><span></span><span></span>
             </button>
 
+            <!-- data-customer-panel e usado pelo JavaScript para abrir cada aba. -->
             <nav class="side-nav">
                 <button class="active" type="button" data-customer-panel="inicio">Início</button>
                 <button type="button" data-customer-panel="resumo">Resumo</button>
                 <button type="button" data-customer-panel="boletos">Meus Boletos</button>
                 <button type="button" data-customer-panel="servicos">Meus Serviços</button>
+                <button type="button" data-customer-panel="dados">Meus dados</button>
                 <button type="button" data-customer-panel="relatorios">Relatórios</button>
                 <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
 
+        <!-- Conteudo principal restrito ao CNPJ logado. -->
         <main class="app-main">
             <header class="topbar">
                 <div>
                     <span class="topbar-kicker">Área do Cliente</span>
                     <h1>{{ usuario.nome }}</h1>
                 </div>
-                <span>CNPJ {{ usuario.identificador }}</span>
+                <button class="customer-profile-trigger" type="button" data-customer-panel="dados" title="Abrir meus dados">
+                    CNPJ {{ usuario.identificador }}
+                </button>
             </header>
 
+            {% if mensagem %}<div class="form-success dashboard-message"><strong>{{ mensagem }}</strong></div>{% endif %}
+            {% if erro %}<div class="form-error dashboard-message"><strong>{{ erro }}</strong></div>{% endif %}
+            {% if endereco_pendente %}
+                <article class="content-panel customer-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Complete seu endereço</h2>
+                            <p>Seu cadastro foi criado recentemente. Finalize os dados do endereço para manter suas informações atualizadas.</p>
+                        </div>
+                    </div>
+                    <form method="post" class="dashboard-form compact-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="acao" value="completar_endereco">
+                        <label><span>CEP</span><input value="{{ endereco.cep }}" readonly></label>
+                        <label><span>Logradouro</span><input name="logradouro" value="{{ endereco.logradouro or '' }}" required></label>
+                        <label><span>Cidade</span><input name="cidade" value="{{ '' if endereco.cidade == 'PENDENTE' else endereco.cidade }}" required></label>
+                        <label><span>UF</span><input name="uf" value="{{ '' if endereco.uf == '--' else endereco.uf }}" maxlength="2" required></label>
+                        <label><span>Número</span><input name="numero" type="number" value="{{ endereco.numero or '' }}"></label>
+                        <label><span>Complemento</span><input name="complemento" value="{{ endereco.complemento or '' }}"></label>
+                        <button class="btn primary" type="submit">Salvar endereço</button>
+                    </form>
+                </article>
+            {% endif %}
+
+            <!-- Alerta exibido quando existe pelo menos um boleto em aberto. -->
             {% if boleto_aberto %}
                 <div class="alert customer-alert">
                     Atenção: você possui boleto em aberto com vencimento para {{ boleto_aberto.data_vencimento.strftime('%d/%m/%Y') }}.
                 </div>
             {% endif %}
             <section class="dashboard customer-workspace">
+                <!-- Aba inicial: filtro de periodo, cards financeiros e consumo resumido. -->
                 <div class="customer-tab-panel active" data-customer-content="inicio">
+                    <!-- O filtro envia GET para dashboard_cliente() e recalcula boletos/servicos. -->
                     <form class="period-filter" method="get" action="{{ url_for('dashboard_cliente') }}">
                         <label for="periodo">Período de análise</label>
                         <select id="periodo" name="periodo" onchange="this.form.submit()">
+                            <!-- periodos vem do dicionario PERIODOS_CLIENTE em app.py. -->
                             {% for chave, item in periodos.items() %}
                                 <option value="{{ chave }}" {% if chave == periodo_atual %}selected{% endif %}>{{ item.label }}</option>
                             {% endfor %}
@@ -87,6 +122,7 @@
                             </div>
                         </div>
                         <div class="overview-bars">
+                            <!-- servicos_populares e calculado em calcular_resumo_cliente(). -->
                             {% for item in resumo.servicos_populares %}
                                 <div class="overview-bar">
                                     <span>{{ item.nome }}</span>
@@ -100,6 +136,7 @@
                     </article>
                 </div>
 
+                <!-- Aba Resumo: grafico e ranking dos servicos mais usados. -->
                 <article class="content-panel customer-panel customer-summary customer-tab-panel" data-customer-content="resumo" id="resumo">
                     <div class="panel-heading">
                         <div>
@@ -108,11 +145,13 @@
                         </div>
                     </div>
                     <div class="customer-summary-layout">
+                        <!-- Variaveis CSS montam o grafico com percentuais calculados no backend. -->
                         <div class="customer-pie"
                              style="--s1: {{ resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0 }}%; --s2: {{ ((resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0) + (resumo.servicos_populares[1].participacao if resumo.servicos_populares|length > 1 else 0)) }}%; --s3: {{ ((resumo.servicos_populares[0].participacao if resumo.servicos_populares|length > 0 else 0) + (resumo.servicos_populares[1].participacao if resumo.servicos_populares|length > 1 else 0) + (resumo.servicos_populares[2].participacao if resumo.servicos_populares|length > 2 else 0)) }}%;">
                             <span>{{ resumo.total_quantidade|int }}<small>usos</small></span>
                         </div>
                         <div class="usage-list">
+                            <!-- Lista detalhada dos servicos populares. -->
                             {% for item in resumo.servicos_populares %}
                                 <div class="usage-item">
                                     <div>
@@ -128,6 +167,7 @@
                     </div>
                 </article>
 
+                <!-- Aba Boletos: mostra apenas boletos vinculados ao cliente logado. -->
                 <article class="content-panel customer-panel customer-tab-panel" data-customer-content="boletos" id="boletos">
                     <div class="panel-heading">
                         <div>
@@ -164,6 +204,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <!-- classe_status() vem do app.py e converte status em classe CSS. -->
                                 {% for boleto in boletos %}
                                     <tr>
                                         <td>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }}</td>
@@ -180,6 +221,7 @@
                     </div>
                 </article>
 
+                <!-- Aba Servicos: historico de servicos utilizados no periodo selecionado. -->
                 <article class="content-panel customer-panel customer-tab-panel" data-customer-content="servicos" id="servicos">
                     <div class="panel-heading">
                         <div>
@@ -199,6 +241,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <!-- data_hora_br e brl sao filtros Jinja registrados no app.py. -->
                                 {% for servico in servicos %}
                                     <tr>
                                         <td>{{ servico.data_registro|data_hora_br }}</td>
@@ -213,13 +256,44 @@
                             </tbody>
                         </table>
                     </div>
+                </article>
+
+                <!-- Aba Dados: cadastro empresarial vinculado ao CNPJ logado. -->
+                <article class="content-panel customer-panel customer-tab-panel" data-customer-content="dados" id="dados">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Meus dados cadastrais</h2>
+                            <p>Confira as informa&ccedil;&otilde;es vinculadas ao seu CNPJ.</p>
+                        </div>
+                    </div>
+                    <div class="customer-profile-grid">
+                        <div><small>CNPJ</small><strong>{{ cadastro.cnpj }}</strong></div>
+                        <div><small>Raz&atilde;o social</small><strong>{{ cadastro.razao_social or '-' }}</strong></div>
+                        <div><small>Telefone</small><strong>{{ cadastro.telefone or '-' }}</strong></div>
+                        <div><small>E-mail</small><strong>{{ cadastro.email or '-' }}</strong></div>
+                        <div><small>CEP</small><strong>{{ cadastro.cep or '-' }}</strong></div>
+                        <div><small>Logradouro</small><strong>{{ cadastro.logradouro or '-' }}</strong></div>
+                        <div><small>N&uacute;mero</small><strong>{{ cadastro.numero or '-' }}</strong></div>
+                        <div><small>Complemento</small><strong>{{ cadastro.complemento or '-' }}</strong></div>
+                        <div><small>Cidade</small><strong>{{ cadastro.cidade if cadastro.cidade != 'PENDENTE' else '-' }}</strong></div>
+                        <div><small>UF</small><strong>{{ cadastro.uf if cadastro.uf != '--' else '-' }}</strong></div>
+                    </div>
+                    <div class="customer-vehicle-list">
+                        <h3>Ve&iacute;culos cadastrados</h3>
+                        {% for veiculo in veiculos %}
+                            <span><strong>{{ veiculo.placa_veiculo }}</strong> - {{ veiculo.modelo }} - {{ veiculo.ano }}</span>
+                        {% else %}
+                            <span>Nenhum ve&iacute;culo cadastrado.</span>
+                        {% endfor %}
+                    </div>
                     <div class="customer-dispute-note">
-                        <strong>Observou algum dado incorreto ou divergente?</strong>
-                        <span>Entre em contato com a equipe para revisarmos boletos, serviços ou valores vinculados ao seu CNPJ.</span>
-                        <a class="btn primary" href="{{ url_for('contato') }}">Preencher formulário</a>
+                        <strong>Encontrou alguma informa&ccedil;&atilde;o incorreta ou divergente?</strong>
+                        <span>Entre em contato com a equipe para revisarmos seus dados, boletos, servi&ccedil;os ou valores vinculados ao CNPJ.</span>
+                        <a class="btn primary" href="{{ url_for('contato') }}">Falar com a equipe</a>
                     </div>
                 </article>
 
+                <!-- Aba Relatorios: exportacao restrita ao proprio cliente. -->
                 <article class="content-panel customer-panel customer-tab-panel" data-customer-content="relatorios" id="relatorios">
                     <div class="panel-heading">
                         <div>
@@ -242,6 +316,7 @@
         </main>
     </div>
     <script>
+        // Alterna as abas da area do cliente sem recarregar a pagina.
         document.querySelectorAll('[data-customer-panel]').forEach((button) => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('[data-customer-panel]').forEach((item) => item.classList.remove('active'));
@@ -253,6 +328,7 @@
             });
         });
 
+        // Abre/fecha o menu lateral em telas menores.
         document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
             const sidebar = event.currentTarget.closest('.sidebar');
             const aberto = sidebar.classList.toggle('nav-open');

@@ -1,3 +1,9 @@
+-- ============================================================
+-- BANCO SQLITE AUXILIAR DO SITE
+-- Ele cria dados locais usados para login, contato e demonstracao.
+-- ============================================================
+
+-- Mensagens enviadas pelo formulario publico de contato.
 CREATE TABLE IF NOT EXISTS contatos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -8,6 +14,7 @@ CREATE TABLE IF NOT EXISTS contatos (
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Contas que podem entrar no site como cliente, funcionario ou admin.
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -19,6 +26,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Estrutura local antiga mantida para compatibilidade com a demonstracao.
+-- Os clientes operacionais atuais ficam no MySQL rota_facil.
 CREATE TABLE IF NOT EXISTS clientes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario_id INTEGER,
@@ -30,6 +39,8 @@ CREATE TABLE IF NOT EXISTS clientes (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+-- Catalogo local antigo mantido para compatibilidade.
+-- Os precos atuais exibidos pelo sistema sao lidos do MySQL.
 CREATE TABLE IF NOT EXISTS servicos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -38,6 +49,8 @@ CREATE TABLE IF NOT EXISTS servicos (
     ativo INTEGER NOT NULL DEFAULT 1
 );
 
+-- Boletos locais antigos de demonstracao.
+-- Os boletos operacionais atuais tambem sao lidos do MySQL.
 CREATE TABLE IF NOT EXISTS boletos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     cliente_id INTEGER NOT NULL,
@@ -49,6 +62,7 @@ CREATE TABLE IF NOT EXISTS boletos (
     FOREIGN KEY (cliente_id) REFERENCES clientes(id)
 );
 
+-- Registros iniciais criados apenas se ainda nao existirem.
 INSERT OR IGNORE INTO usuarios (id, nome, email, documento, senha, tipo) VALUES
     (1, 'Administrador', 'admin@novarota.local', '00000000000000', 'admin123', 'admin'),
     (2, 'João Silva', 'funcionario@novarota.local', '11111111111111', 'func123', 'funcionario'),

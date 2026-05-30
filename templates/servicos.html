@@ -1,39 +1,43 @@
+<!-- Vitrine publica que apresenta as categorias de servicos do posto. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servicos - Posto Nova Rota</title>
+    <title>Serviços - Posto Nova Rota</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
+    <!-- Navegacao padrao das paginas internas publicas. -->
     <nav class="page-nav">
         <a class="brand dark" href="{{ url_for('home') }}">
             <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
             <span class="brand-name">Nova Rota</span>
         </a>
         <div class="nav-links dark">
-            <a href="{{ url_for('servicos') }}">Servicos</a>
+            <a href="{{ url_for('servicos') }}">Serviços</a>
             <a href="{{ url_for('esg') }}">ESG</a>
-            <a href="{{ url_for('sobre') }}">Sobre Nos</a>
+            <a href="{{ url_for('sobre') }}">Sobre Nós</a>
             <a href="{{ url_for('contato') }}">Contato</a>
         </div>
         <div class="nav-actions">
             <a class="btn ghost" href="{{ url_for('login', tipo='funcionario') }}">Login</a>
-            <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Area do Cliente</a>
+            <a class="btn primary btn-highlight" href="{{ url_for('login', tipo='cliente') }}">Área do Cliente</a>
         </div>
     </nav>
 
     <main class="service-band">
         <section class="section page-section">
-            <h1 class="section-title">Nossos Servicos</h1>
+            <h1 class="section-title">Nossos Serviços</h1>
+            <!-- Cards principais; cada um aponta para uma rota de detalhe em app.py. -->
             <div class="service-grid services-three">
                 <a class="service-card" href="{{ url_for('servico_combustivel') }}">
-                    <img src="{{ url_for('static', filename='img/servico-combustivel.png') }}" alt="Abastecimento de combustivel Nova Rota">
+                    <img src="{{ url_for('static', filename='img/servico-combustivel.png') }}" alt="Abastecimento de combustível Nova Rota">
                     <div>
-                        <h3>Combustivel</h3>
-                        <p>Gasolina comum, aditivada, etanol e diesel S10 com precos fixos por litro.</p>
+                        <h3>Combustível</h3>
+                        <p>Gasolina comum, aditivada, etanol e diesel S10 com preços fixos por litro.</p>
+                        <!-- Usa preco vindo do MySQL; se nao houver dado, usa valor padrao. -->
                         <strong class="price-chip">A partir de {{ (precos[0].valor_unitario if precos else 5.49)|brl }}</strong>
                     </div>
                 </a>
@@ -42,7 +46,8 @@
                     <img src="{{ url_for('static', filename='img/servico-lavagem.png') }}" alt="Lavagem Nova Rota">
                     <div>
                         <h3>Lavagem</h3>
-                        <p>Modalidades simples, completa, higienizacao interna e acabamento especial.</p>
+                        <p>Modalidades simples, completa, higienização interna e acabamento especial.</p>
+                        <!-- O filtro brl foi registrado no app.py para formatar moeda. -->
                         <strong class="price-chip">A partir de {{ (precos[1].valor_unitario if precos|length > 1 else 35)|brl }}</strong>
                     </div>
                 </a>
@@ -51,13 +56,15 @@
                     <img src="{{ url_for('static', filename='img/servico-estacionamento.png') }}" alt="Estacionamento Nova Rota">
                     <div>
                         <h3>Estacionamento</h3>
-                        <p>Rotativo por hora, diaria e plano mensal para empresas e clientes frequentes.</p>
+                        <p>Rotativo por hora, diária e plano mensal para empresas e frotas.</p>
+                        <!-- Verifica o tamanho da lista para evitar erro quando o banco retorna vazio. -->
                         <strong class="price-chip">A partir de {{ (precos[2].valor_unitario if precos|length > 2 else 8)|brl }}</strong>
                     </div>
                 </a>
             </div>
         </section>
     </main>
+    <!-- Inclui o rodape compartilhado. -->
     {% include '_footer.html' %}
 </body>
 </html>

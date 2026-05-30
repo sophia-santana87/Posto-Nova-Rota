@@ -2,8 +2,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+
+# Este arquivo funciona como um caderno de ocorrencias do sistema.
+# Cada logger escreve um tipo de acontecimento em seu proprio arquivo.
 def setup_logger(name, log_file):
-    """Configurar logger com arquivo rotativo"""
+    """Configura um logger que escreve no arquivo e tambem no terminal."""
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
     
@@ -38,7 +41,7 @@ def setup_logger(name, log_file):
     
     return logger
 
-# Inicializar loggers específicos
+# Cria quatro cadernos separados para facilitar a consulta posterior.
 logger_sistema = setup_logger('sistema', 'logs/sistema.log')
 logger_acesso = setup_logger('acesso', 'logs/acesso.log')
 logger_auditoria = setup_logger('auditoria', 'logs/auditoria.log')

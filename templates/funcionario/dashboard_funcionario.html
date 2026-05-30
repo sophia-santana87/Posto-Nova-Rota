@@ -1,14 +1,16 @@
+<!-- Painel operacional: consulta clientes e registra novos servicos consumidos. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area do Funcionario</title>
+    <title>Área do Funcionário</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-responsive.css') }}">
 </head>
 <body class="employee-dashboard">
     <div class="app-layout dashboard-shell">
+        <!-- Barra lateral do funcionario; os botoes alternam paineis via JavaScript. -->
         <aside class="sidebar employee">
             <a class="dashboard-brand" href="{{ url_for('home') }}">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
@@ -17,6 +19,7 @@
             <button class="dashboard-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu">
                 <span></span><span></span><span></span>
             </button>
+            <!-- painel_ativo vem do app.py e mantem a aba correta depois de filtros/POST. -->
             <nav class="side-nav">
                 <button class="{{ 'active' if painel_ativo == 'visao-geral' else '' }}" type="button" data-panel="visao-geral">Dashboard</button>
                 <button class="{{ 'active' if painel_ativo == 'clientes' else '' }}" type="button" data-panel="clientes">Clientes</button>
@@ -28,19 +31,22 @@
             </nav>
         </aside>
 
+        <!-- Conteudo principal da area operacional. -->
         <main class="app-main">
             <header class="topbar">
                 <div>
-                    <span class="topbar-kicker">Operacao Nova Rota</span>
-                    <h1>Dashboard do Funcionario</h1>
+                    <span class="topbar-kicker">Operação Nova Rota</span>
+                    <h1>Dashboard do Funcionário</h1>
                 </div>
                 <span>Bem-vindo, {{ usuario.nome }}</span>
             </header>
 
+            <!-- Mensagens de sucesso/erro sao geradas pela rota dashboard_funcionario(). -->
             {% if mensagem %}<div class="form-success dashboard-message"><strong>{{ mensagem }}</strong></div>{% endif %}
             {% if erro %}<div class="form-error dashboard-message"><strong>{{ erro }}</strong></div>{% endif %}
 
             <section class="dashboard employee-workspace">
+                <!-- Aba inicial: resumo visual de boletos por status. -->
                 <div class="employee-panel {{ 'active' if painel_ativo == 'visao-geral' else '' }}" data-panel-content="visao-geral">
                     <article class="chart-card status-panel">
                         <div class="panel-heading">
@@ -56,6 +62,7 @@
                                 <div class="status-hover paid">
                                     <span><i class="paid-dot"></i>Pagos: {{ resumo.boletos_pagos }}</span>
                                     <div class="status-popover">
+                                        <!-- for/else exibe os boletos ou uma mensagem quando a lista vem vazia. -->
                                         {% for boleto in boletos_pagos %}
                                             <strong>{{ boleto.razao_social }}</strong>
                                             <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
@@ -99,11 +106,13 @@
                     </article>
                 </div>
 
+                <!-- Aba Clientes: consulta operacional sem expor o CNPJ completo. -->
                 <article class="content-panel client-search-panel employee-panel {{ 'active' if painel_ativo == 'clientes' else '' }}" data-panel-content="clientes">
                     <div class="panel-heading">
                         <h2>Consulta de clientes</h2>
                         <p>O CNPJ aparece mascarado para preservar os dados do cliente.</p>
                     </div>
+                    <!-- Busca por cliente usando metodo GET para manter o termo na URL. -->
                     <form class="client-search" method="get" action="{{ url_for('dashboard_funcionario') }}">
                         <input type="search" name="cliente" value="{{ busca }}" placeholder="Digite o nome da empresa">
                         <button class="btn primary" type="submit">Pesquisar</button>
@@ -113,6 +122,7 @@
                         <table class="table employee-table">
                             <thead><tr><th>Cliente</th><th>CNPJ</th><th>E-mail</th><th>Boletos</th><th>Em aberto</th></tr></thead>
                             <tbody>
+                                <!-- clientes ja chega com cnpj_mascarado criado no app.py. -->
                                 {% for cliente in clientes %}
                                     <tr>
                                         <td>{{ cliente.razao_social }}</td>
@@ -129,11 +139,13 @@
                     </div>
                 </article>
 
+                <!-- Aba Boletos: filtro por cliente/servico e status. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'boletos' else '' }}" data-panel-content="boletos">
                     <div class="panel-heading">
                         <h2>Boletos</h2>
                         <p>Consulta operacional de vencimento, status e serviço vinculado.</p>
                     </div>
+                    <!-- Os filtros sao lidos por dashboard_funcionario() e aplicados na consulta SQL. -->
                     <form class="client-search boleto-filter-form" method="get" action="{{ url_for('dashboard_funcionario') }}">
                         <input type="search" name="boleto_busca" value="{{ boleto_busca }}" placeholder="Filtrar por cliente ou serviço">
                         <select name="boleto_status">
@@ -147,7 +159,7 @@
                     </form>
                     <div class="table-frame">
                         <table class="table employee-table">
-                            <thead><tr><th>Cliente</th><th>Servico</th><th>Vencimento</th><th>Valor final</th><th>Status</th></tr></thead>
+                            <thead><tr><th>Cliente</th><th>Serviço</th><th>Vencimento</th><th>Valor final</th><th>Status</th></tr></thead>
                             <tbody>
                                 {% for boleto in boletos %}
                                     <tr>
@@ -165,11 +177,13 @@
                     </div>
                 </article>
 
+                <!-- Aba Faturamento: consulta mensal de consumo e faturas sem boleto. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'faturamento' else '' }}" data-panel-content="faturamento">
                     <div class="panel-heading">
                         <h2>Faturamento mensal</h2>
-                        <p>Conferencia do que cada cliente consumiu no mes antes da emissao dos boletos.</p>
+                        <p>Conferencia do consumo mensal e do vinculo 1:1 entre fatura e boleto.</p>
                     </div>
+                    <!-- Filtro por cliente/CNPJ e competencia mensal. -->
                     <form class="client-search boleto-filter-form" method="get" action="{{ url_for('dashboard_funcionario') }}">
                         <input type="search" name="faturamento_busca" value="{{ faturamento_busca }}" placeholder="Filtrar por cliente ou CNPJ">
                         <input type="month" name="competencia" value="{{ competencia }}">
@@ -178,8 +192,9 @@
                     </form>
                     <div class="table-frame">
                         <table class="table employee-table">
-                            <thead><tr><th>Cliente</th><th>Mes</th><th>Servicos</th><th>Quantidade</th><th>Total</th><th>Pendentes</th></tr></thead>
+                            <thead><tr><th>Cliente</th><th>Mês</th><th>Serviços</th><th>Quantidade</th><th>Total</th><th>Sem boleto</th></tr></thead>
                             <tbody>
+                                <!-- resumos_mensais vem de listar_resumos_mensais(). -->
                                 {% for mensal in resumos_mensais %}
                                     <tr>
                                         <td>{{ mensal.razao_social }}</td>
@@ -197,17 +212,20 @@
                     </div>
                 </article>
 
+                <!-- Aba Registrar Servico: cria servico, fatura e boleto automaticamente. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'registrar-servico' else '' }}" data-panel-content="registrar-servico">
                     <div class="panel-heading">
                         <h2>Registrar novo serviço</h2>
                         <p>Selecione a empresa e valide o veículo vinculado antes de salvar o serviço.</p>
                     </div>
+                    <!-- Formulario POST processado pela rota dashboard_funcionario(). -->
                     <form method="post" class="dashboard-form service-register-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <label>
                             <span>Cliente</span>
                             <select id="cliente-registro" name="cnpj" required>
                                 <option value="">Selecione cliente</option>
+                                <!-- data-veiculos guarda as placas do cliente em JSON para o JavaScript preencher o select. -->
                                 {% for cliente in clientes_registro %}
                                     <option
                                         value="{{ cliente.cnpj }}"
@@ -228,8 +246,9 @@
                         </p>
                         <label><span>Data do serviço</span><input name="data_registro" type="date" value="{{ hoje }}" required></label>
                         <label>
-                            <span>Servico</span>
+                            <span>Serviço</span>
                             <select name="tipo_servico" required>
+                                <!-- precos vem da tabela servico_utilizado. -->
                                 {% for servico in precos %}
                                     <option value="{{ servico.id }}">
                                         {{ servico.nome }} - {{ (servico.valor_unitario - (servico.desconto or 0))|brl }}
@@ -242,6 +261,7 @@
                     </form>
                 </article>
 
+                <!-- Aba Relatorios: exportacao operacional em CSV ou PDF. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'relatorios' else '' }}" data-panel-content="relatorios">
                     <div class="panel-heading">
                         <h2>Relatórios</h2>
@@ -262,6 +282,7 @@
         </main>
     </div>
     <script>
+        // Alterna as abas do dashboard sem recarregar a pagina.
         document.querySelectorAll('[data-panel]').forEach((button) => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('[data-panel]').forEach((item) => item.classList.remove('active'));
@@ -273,16 +294,19 @@
             });
         });
 
+        // Abre/fecha o menu lateral em telas menores.
         document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
             const sidebar = event.currentTarget.closest('.sidebar');
             const aberto = sidebar.classList.toggle('nav-open');
             event.currentTarget.setAttribute('aria-expanded', String(aberto));
         });
 
+        // Elementos do formulario de registro de servico.
         const clienteRegistro = document.querySelector('#cliente-registro');
         const veiculoRegistro = document.querySelector('#registro-veiculo');
 
         if (clienteRegistro) {
+            // Quando o cliente muda, o select de veiculos e preenchido com as placas vinculadas.
             clienteRegistro.addEventListener('change', () => {
                 const selected = clienteRegistro.selectedOptions[0];
                 const veiculos = selected?.dataset.veiculos ? JSON.parse(selected.dataset.veiculos) : [];

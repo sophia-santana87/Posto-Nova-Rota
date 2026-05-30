@@ -1,3 +1,4 @@
+<!-- Pagina publica com formulario para enviar duvidas e solicitar atendimento. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo.css') }}">
 </head>
 <body class="inner-page">
+    <!-- Navegacao padrao das paginas internas publicas. -->
     <nav class="page-nav">
         <a class="brand dark" href="{{ url_for('home') }}">
             <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
@@ -28,16 +30,21 @@
     </nav>
 
     <main class="section page-section contact-page">
+        <!-- Introducao da pagina de contato. -->
         <section class="contact-intro">
             <p class="eyebrow">Fale com a equipe</p>
             <h1>Como podemos ajudar?</h1>
             <p>Envie sua solicitação para novos cadastros, dúvidas sobre boletos, atendimento empresarial ou suporte ao sistema RotaFácil.</p>
         </section>
 
+        <!-- Layout em duas colunas: formulario e informacoes de atendimento. -->
         <section class="contact-layout">
+            <!-- Formulario enviado para a rota contato() em app.py. -->
             <form class="contact-form" action="{{ url_for('contato') }}" method="post">
+                <!-- Token CSRF obrigatorio para proteger o envio. -->
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+                <!-- Confirma que a mensagem foi salva no banco local. -->
                 {% if enviado %}
                     <div class="form-success">
                         <strong>Mensagem registrada com sucesso.</strong>
@@ -45,6 +52,7 @@
                     </div>
                 {% endif %}
 
+                <!-- Aviso quando o salvamento funcionou, mas o e-mail nao foi enviado. -->
                 {% if aviso_envio %}
                     <div class="form-error">
                         <strong>Atenção ao envio por e-mail.</strong>
@@ -52,6 +60,7 @@
                     </div>
                 {% endif %}
 
+                <!-- Erro quando houve falha no salvamento ou no processamento. -->
                 {% if erro_envio %}
                     <div class="form-error">
                         <strong>Não foi possível registrar a mensagem.</strong>
@@ -97,6 +106,7 @@
                 <button class="btn primary" type="submit">Enviar mensagem</button>
             </form>
 
+            <!-- Informacoes estaticas de atendimento ao lado do formulario. -->
             <aside class="contact-side">
                 <h2>Atendimento Nova Rota</h2>
                 <p>Para empresas e clientes, nossa equipe acompanha solicitações com foco em agilidade, clareza e segurança.</p>
@@ -125,6 +135,7 @@
             </aside>
         </section>
     </main>
+    <!-- Inclui o rodape compartilhado. -->
     {% include '_footer.html' %}
 </body>
 </html>

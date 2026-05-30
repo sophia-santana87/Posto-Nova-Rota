@@ -1,3 +1,7 @@
+/* Estilos principais do site Nova Rota.
+   Este arquivo define a identidade visual comum: cores, botoes, paginas
+   publicas e a base compartilhada pelos paineis internos. */
+
 :root {
     /* Paleta Neutra e Profissional (Mantendo a compatibilidade com o resto do código) */
     --ink: #1e293b;        /* Cinza Escuro Principal */
@@ -2382,6 +2386,40 @@ a.service-card:hover img {
     grid-column: span 2;
 }
 
+.vehicle-form-block {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #d7e4f4;
+    border-radius: 8px;
+    background: #f8fbff;
+}
+
+.vehicle-form-head,
+.vehicle-form-row {
+    display: grid;
+    gap: 10px;
+}
+
+.vehicle-form-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.vehicle-form-head span {
+    color: var(--ink);
+    font-weight: 900;
+}
+
+.vehicle-form-row {
+    grid-template-columns: minmax(110px, 0.8fr) minmax(180px, 1.4fr) minmax(90px, 0.6fr) auto;
+    align-items: end;
+}
+
+.vehicle-form-row .btn {
+    min-height: 44px;
+}
+
 .mini-metrics,
 .admin-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2470,6 +2508,28 @@ a.service-card:hover img {
     color: var(--blue-dark);
     font-size: 1.25rem;
     white-space: nowrap;
+}
+
+.monthly-summary-card:has(.monthly-detail:not([hidden])) {
+    grid-column: 1 / -1;
+}
+
+.monthly-detail {
+    display: grid;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid #dbeafe;
+}
+
+.monthly-detail[hidden] {
+    display: none;
+}
+
+.monthly-detail-total {
+    margin: 0;
+    color: var(--blue-dark);
+    font-weight: 800;
+    text-align: right;
 }
 
 .monthly-summary-items {

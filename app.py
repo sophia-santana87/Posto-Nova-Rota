@@ -1,6 +1,8 @@
+﻿# Garante que o navegador receba arquivos CSS com o tipo MIME correto.
 import mimetypes
 mimetypes.add_type('text/css', '.css')
 
+# Bibliotecas usadas para relatórios, backups, datas, e-mail e utilitários gerais.
 import csv
 import io
 import json
@@ -26,9 +28,11 @@ from database.mysql_conexao import execute_insert_id, execute_query, fetch_all, 
 from utils.logger import logger_acesso, logger_auditoria, logger_erro
 
 
+# Caminho base do projeto; tudo que depende de arquivo local parte daqui.
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / '.env')
 
+# Instância principal do Flask, apontando explicitamente para static/ e templates/.
 app = Flask(
     __name__,
     static_folder=str(BASE_DIR / 'static'),
@@ -36,68 +40,73 @@ app = Flask(
     template_folder=str(BASE_DIR / 'templates'),
 )
 
+# A chave secreta protege sessão, cookies e tokens CSRF.
 app.secret_key = os.getenv('SECRET_KEY')
 if not app.secret_key:
     raise RuntimeError('SECRET_KEY nao configurada no .env!')
 
+# Desativa cache padrão de arquivos enviados pelo Flask em ambiente de desenvolvimento.
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# Proteção contra envio malicioso de formulários por sites externos.
 csrf = CSRFProtect(app)
 
+# Inicializa o banco local usado para usuários, mensagens e dados auxiliares.
 init_db()
 
 
+# Catálogo fixo usado nas páginas públicas detalhadas de serviços.
 SERVICOS_DETALHADOS = {
     'combustivel': [
         {
             'nome': 'Gasolina comum',
             'preco': Decimal('5.49'),
             'unidade': 'litro',
-            'descricao': 'Combustivel de boa estabilidade para uso diario, com controle de qualidade e rendimento equilibrado.',
+            'descricao': 'Combustível de boa estabilidade para uso diário, com controle de qualidade e rendimento equilibrado.',
         },
         {
             'nome': 'Gasolina aditivada',
             'preco': Decimal('5.79'),
             'unidade': 'litro',
-            'descricao': 'Contem aditivos detergentes e dispersantes que ajudam a manter bicos, valvulas e camara de combustao mais limpos.',
+            'descricao': 'Contém aditivos detergentes e dispersantes que ajudam a manter bicos, válvulas e câmara de combustão mais limpos.',
         },
         {
             'nome': 'Etanol',
             'preco': Decimal('3.89'),
             'unidade': 'litro',
-            'descricao': 'Etanol hidratado de alta qualidade, com queima mais limpa, boa resposta do motor e origem renovavel.',
+            'descricao': 'Etanol hidratado de alta qualidade, com queima mais limpa, boa resposta do motor e origem renovável.',
         },
         {
             'nome': 'Diesel S10',
             'preco': Decimal('6.09'),
             'unidade': 'litro',
-            'descricao': 'Diesel com baixo teor de enxofre, indicado para motores modernos e para uma operacao mais eficiente da frota.',
+            'descricao': 'Diesel com baixo teor de enxofre, indicado para motores modernos e para uma operação mais eficiente da frota.',
         },
     ],
     'lavagem': [
         {
             'nome': 'Lavagem simples',
             'preco': Decimal('25.00'),
-            'unidade': 'servico',
-            'descricao': 'Limpeza externa rapida para remover poeira, marcas do uso diario e renovar a apresentacao do veiculo.',
+            'unidade': 'serviço',
+            'descricao': 'Limpeza externa rápida para remover poeira, marcas do uso diário e renovar a apresentação do veículo.',
         },
         {
             'nome': 'Lavagem completa',
             'preco': Decimal('35.00'),
-            'unidade': 'servico',
-            'descricao': 'Cuidado externo e interno, com atencao a rodas, vidros, painel e acabamento geral.',
+            'unidade': 'serviço',
+            'descricao': 'Cuidado externo e interno, com atenção a rodas, vidros, painel e acabamento geral.',
         },
         {
-            'nome': 'Higienizacao interna',
+            'nome': 'Higienização interna',
             'preco': Decimal('60.00'),
-            'unidade': 'servico',
-            'descricao': 'Processo focado em bancos, tapetes e superficies internas para mais conforto e sensacao de limpeza.',
+            'unidade': 'serviço',
+            'descricao': 'Processo focado em bancos, tapetes e superfícies internas para mais conforto e sensação de limpeza.',
         },
         {
             'nome': 'Acabamento especial',
             'preco': Decimal('45.00'),
-            'unidade': 'servico',
-            'descricao': 'Finalizacao com brilho e protecao visual para valorizar a pintura e melhorar a aparencia do carro.',
+            'unidade': 'serviço',
+            'descricao': 'Finalização com brilho e proteção visual para valorizar a pintura e melhorar a aparência do veículo.',
         },
     ],
     'estacionamento': [
@@ -105,25 +114,26 @@ SERVICOS_DETALHADOS = {
             'nome': 'Estacionamento rotativo',
             'preco': Decimal('8.00'),
             'unidade': 'hora',
-            'descricao': 'Ideal para paradas curtas, com controle de entrada e saida para mais praticidade.',
+            'descricao': 'Ideal para paradas curtas, com controle de entrada e saída para mais praticidade.',
         },
         {
-            'nome': 'Diaria',
+            'nome': 'Diária',
             'preco': Decimal('35.00'),
             'unidade': 'dia',
-            'descricao': 'Opcao para quem precisa deixar o veiculo por mais tempo com previsibilidade de custo.',
+            'descricao': 'Opção para quem precisa deixar o veículo por mais tempo com previsibilidade de custo.',
         },
         {
             'nome': 'Estacionamento mensal',
             'preco': Decimal('150.00'),
-            'unidade': 'mes',
-            'descricao': 'Plano recorrente para empresas e clientes frequentes, facilitando controle e faturamento.',
+            'unidade': 'mês',
+            'descricao': 'Plano recorrente para empresas e frotas, facilitando controle e faturamento.',
         },
     ],
 }
 
 
 def brl(valor):
+    """Formata valores numericos no padrao monetario brasileiro."""
     try:
         numero = Decimal(str(valor or 0))
     except Exception:
@@ -137,11 +147,13 @@ app.jinja_env.filters['brl'] = brl
 
 @app.context_processor
 def inject_globals():
+    """Disponibiliza variaveis globais para todos os templates."""
     return {'current_year': datetime.now().year}
 
 
 @app.after_request
 def no_cache(response):
+    """Impede que paginas dinamicas fiquem presas no cache do navegador."""
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -149,14 +161,17 @@ def no_cache(response):
 
 
 def somente_digitos(valor):
+    """Remove tudo que nao for numero, util para CNPJ, telefone e CEP."""
     return re.sub(r'\D', '', str(valor or ''))
 
 
 def normalizar_placa(valor):
+    """Padroniza placa em maiusculas, sem separadores e com ate 7 caracteres."""
     return ''.join(caractere for caractere in (valor or '').upper() if caractere.isalnum())[:7]
 
 
 def parse_veiculos_formulario(texto, modelo_padrao='', ano_padrao=''):
+    """Converte um campo de texto livre em uma lista estruturada de veiculos."""
     veiculos = []
     vistos = set()
     modelo_padrao = (modelo_padrao or 'Não informado').strip() or 'Não informado'
@@ -179,7 +194,34 @@ def parse_veiculos_formulario(texto, modelo_padrao='', ano_padrao=''):
     return veiculos
 
 
+def parse_veiculos_request(formulario):
+    """Le placas, modelos e anos vindos dos campos repetidos do formulario."""
+    placas = formulario.getlist('placa_veiculo')
+    modelos = formulario.getlist('modelo_veiculo')
+    anos = formulario.getlist('ano_veiculo')
+    if not placas and formulario.get('placas'):
+        return parse_veiculos_formulario(
+            formulario.get('placas'),
+            formulario.get('modelo_veiculo'),
+            formulario.get('ano_veiculo'),
+        )
+
+    veiculos = []
+    vistos = set()
+    for indice, placa_bruta in enumerate(placas):
+        placa = normalizar_placa(placa_bruta)
+        if not placa or placa in vistos:
+            continue
+        modelo = (modelos[indice] if indice < len(modelos) else '').strip() or 'Não informado'
+        ano_texto = somente_digitos(anos[indice] if indice < len(anos) else '')
+        ano = int(ano_texto or date.today().year)
+        veiculos.append({'placa': placa, 'modelo': modelo[:28], 'ano': ano})
+        vistos.add(placa)
+    return veiculos
+
+
 def mascarar_cnpj(cnpj):
+    """Oculta parte do CNPJ para uso seguro em logs e mensagens."""
     digitos = somente_digitos(cnpj)
     if len(digitos) != 14:
         return 'CNPJ protegido'
@@ -187,6 +229,7 @@ def mascarar_cnpj(cnpj):
 
 
 def mascarar_email(email):
+    """Oculta parte do e-mail sem perder a referencia do dominio."""
     if not email or '@' not in email:
         return 'e-mail nao cadastrado'
     local, dominio = email.split('@', 1)
@@ -198,10 +241,12 @@ def mascarar_email(email):
 
 
 def senha_armazenada_e_hash(valor):
+    """Identifica se a senha ja esta salva como hash do Werkzeug."""
     return str(valor or '').startswith(('pbkdf2:', 'scrypt:'))
 
 
 def senha_confere(usuario, senha):
+    """Compara a senha digitada com hash moderno ou senha antiga em texto."""
     senha_armazenada = usuario['senha'] if usuario else ''
     if senha_armazenada_e_hash(senha_armazenada):
         return check_password_hash(senha_armazenada, senha)
@@ -209,6 +254,7 @@ def senha_confere(usuario, senha):
 
 
 def senha_forte(senha):
+    """Valida a politica minima de senha forte usada na migracao."""
     return bool(
         senha
         and len(senha) >= 8
@@ -219,6 +265,7 @@ def senha_forte(senha):
     )
 
 
+# Senhas temporarias usadas apenas para migrar usuarios legados para hash.
 SENHAS_PADRAO_FORTES = {
     ('admin', 'Administrador'): 'Admin@123',
     ('funcionario', 'João Silva'): 'Func@1234',
@@ -229,6 +276,7 @@ SENHAS_PADRAO_FORTES = {
 
 
 def migrar_senhas_para_hash():
+    """Atualiza senhas antigas do SQLite para hashes seguros."""
     with get_connection() as conexao:
         usuarios = conexao.execute('SELECT id, nome, tipo, senha FROM usuarios').fetchall()
         for usuario in usuarios:
@@ -248,6 +296,7 @@ def migrar_senhas_para_hash():
 
 
 def data_hora_br(valor):
+    """Converte datas do banco para formato brasileiro legivel."""
     if not valor:
         return '-'
     if isinstance(valor, datetime):
@@ -268,6 +317,7 @@ app.jinja_env.filters['data_hora_br'] = data_hora_br
 
 
 def normalizar_linha_relatorio(linha):
+    """Prepara registros para exportacao, convertendo valores para texto."""
     return {
         chave: data_hora_br(valor) if isinstance(valor, (date, datetime)) else str(valor or '')
         for chave, valor in dict(linha).items()
@@ -275,10 +325,11 @@ def normalizar_linha_relatorio(linha):
 
 
 def resposta_csv(nome_arquivo, secoes):
+    """Gera uma resposta HTTP de download contendo relatorio em CSV."""
     saida = io.StringIO()
     escritor = csv.writer(saida, delimiter=';')
     escritor.writerow(['Posto Nova Rota'])
-    escritor.writerow(['Relatorio gerado em', datetime.now().strftime('%d/%m/%Y %H:%M')])
+    escritor.writerow(['Relatório gerado em', datetime.now().strftime('%d/%m/%Y %H:%M')])
     escritor.writerow([])
     for indice, (titulo, linhas) in enumerate(secoes, start=1):
         escritor.writerow([f'{indice}. {titulo}'])
@@ -300,11 +351,14 @@ def resposta_csv(nome_arquivo, secoes):
 
 
 def escapar_pdf(texto):
+    """Escapa caracteres especiais antes de inserir texto no PDF manual."""
     return str(texto).replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
 
 
 def resposta_pdf(nome_arquivo, secoes):
+    """Gera uma resposta HTTP de download contendo relatorio em PDF simples."""
     def texto_pdf(comandos, x, y, texto, tamanho=10, fonte='F1', cor=(0.06, 0.13, 0.24)):
+        """Adiciona um comando de texto na pagina PDF em construcao."""
         r, g, b = cor
         comandos.append(f'{r:.3f} {g:.3f} {b:.3f} rg')
         comandos.append('BT')
@@ -314,11 +368,13 @@ def resposta_pdf(nome_arquivo, secoes):
         comandos.append('ET')
 
     def retangulo_pdf(comandos, x, y, largura, altura, cor):
+        """Desenha retangulos coloridos usados como cabecalhos e cards."""
         r, g, b = cor
         comandos.append(f'{r:.3f} {g:.3f} {b:.3f} rg')
         comandos.append(f'{x} {y} {largura} {altura} re f')
 
     def quebrar_texto(texto, limite=92):
+        """Quebra textos longos para caberem na largura disponivel do PDF."""
         palavras = str(texto or '').split()
         linhas = []
         atual = ''
@@ -338,7 +394,8 @@ def resposta_pdf(nome_arquivo, secoes):
     y = 0
     numero_pagina = 0
 
-    def nova_pagina(subtitulo='Relatorio executivo'):
+    def nova_pagina(subtitulo='Relatório executivo'):
+        """Cria uma nova pagina com cabecalho padronizado."""
         nonlocal comandos, y, numero_pagina
         if comandos:
             paginas.append(comandos)
@@ -348,15 +405,16 @@ def resposta_pdf(nome_arquivo, secoes):
         retangulo_pdf(comandos, 0, 774, 595, 8, (0.04, 0.45, 0.78))
         texto_pdf(comandos, 40, 808, 'Posto Nova Rota', 20, 'F2', (1, 1, 1))
         texto_pdf(comandos, 40, 790, subtitulo, 10, 'F1', (0.88, 0.94, 1))
-        texto_pdf(comandos, 420, 790, f'Pagina {numero_pagina}', 9, 'F1', (0.88, 0.94, 1))
+        texto_pdf(comandos, 420, 790, f'Página {numero_pagina}', 9, 'F1', (0.88, 0.94, 1))
         y = 738
 
     def garantir_espaco(altura):
+        """Abre nova pagina quando o proximo bloco nao cabe na atual."""
         nonlocal y
         if y - altura < 52:
             nova_pagina('Continuação do relatório')
 
-    nova_pagina('Relatorio executivo')
+    nova_pagina('Relatório executivo')
     texto_pdf(comandos, 40, y, f'Gerado em {datetime.now().strftime("%d/%m/%Y %H:%M")}', 11, 'F1')
     y -= 28
 
@@ -450,7 +508,21 @@ def resposta_pdf(nome_arquivo, secoes):
     )
 
 
+RELATORIOS_DATA_INICIAL = datetime.strptime(
+    os.getenv('RELATORIOS_DATA_INICIAL', '2026-05-30'),
+    '%Y-%m-%d',
+).date()
+
+
+def adicionar_filtro_relatorio(where, condicao, params=None):
+    """Acrescenta um filtro temporal sem duplicar WHERE nas consultas."""
+    conector = ' AND ' if where.strip() else 'WHERE '
+    return f'{where}{conector}{condicao}', tuple(params or ()) + (RELATORIOS_DATA_INICIAL,)
+
+
 def relatorio_servicos(where='', params=None, incluir_cnpj=True):
+    """Lista servicos prestados para compor relatorios por perfil."""
+    where, params = adicionar_filtro_relatorio(where, 's.data_registro >= %s', params)
     colunas_cliente = 'c.razao_social AS cliente, c.cnpj, ' if incluir_cnpj else 'c.razao_social AS cliente, '
     linhas = fetch_all(
         'SELECT s.id_Serviço AS id, s.data_registro AS data, '
@@ -458,26 +530,35 @@ def relatorio_servicos(where='', params=None, incluir_cnpj=True):
         's.Veiculo_placa_veiculo AS placa, su.nome AS servico, s.qunt_utilizada AS quantidade, '
         'su.valor_unitario, su.desconto '
         'FROM `serviço` s '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
-        'LEFT JOIN cliente_veiculo cv ON cv.placa_veiculo = s.Veiculo_placa_veiculo '
-        'LEFT JOIN cliente c ON c.cnpj = cv.cliente_cnpj '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
+        'LEFT JOIN fatura f ON f.serviço_id_Serviço = s.id_Serviço '
+        'LEFT JOIN cliente c ON c.cnpj = f.cliente_cnpj '
         f'{where} ORDER BY s.id_Serviço DESC LIMIT 500',
-        params or (),
+        params,
     )
     return [normalizar_linha_relatorio(linha) for linha in linhas]
 
 
 def boletos_relatorio(where='', params=None, limite=500):
-    return [normalizar_linha_relatorio(linha) for linha in listar_boletos(where, params or (), limite=limite)]
+    """Reaproveita a listagem de boletos em formato pronto para relatorio."""
+    where, params = adicionar_filtro_relatorio(where, 'b.data_emissao >= %s', params)
+    return [normalizar_linha_relatorio(linha) for linha in listar_boletos(where, params, limite=limite)]
 
 
 def eventos_auditoria(*termos):
+    """Busca eventos do log de auditoria que contenham todos os termos informados."""
     log_path = BASE_DIR / 'logs' / 'auditoria.log'
     if not log_path.exists():
         return []
     eventos = []
     termos_normalizados = [termo.lower() for termo in termos]
     for linha in log_path.read_text(encoding='utf-8', errors='ignore').splitlines():
+        try:
+            data_evento = datetime.strptime(linha[1:11], '%d/%m/%Y').date()
+        except ValueError:
+            continue
+        if data_evento < RELATORIOS_DATA_INICIAL:
+            continue
         texto = linha.lower()
         if all(termo in texto for termo in termos_normalizados):
             eventos.append({'evento': linha})
@@ -485,9 +566,11 @@ def eventos_auditoria(*termos):
 
 
 def relatorio_admin():
+    """Monta todas as secoes que o administrador pode exportar."""
     clientes = fetch_all(
-        'SELECT cnpj, razao_social, telefone, email, Veiculo_placa_veiculo AS placa, Fatura_id_Fatura AS fatura '
-        'FROM cliente ORDER BY razao_social LIMIT 500'
+        'SELECT c.cnpj, c.razao_social, c.telefone, c.email, '
+        '(SELECT GROUP_CONCAT(v.placa_veiculo SEPARATOR ", ") FROM veiculo v WHERE v.cliente_cnpj = c.cnpj) AS placas '
+        'FROM cliente c ORDER BY c.razao_social LIMIT 500'
     )
     return [
         ('Clientes existentes', [normalizar_linha_relatorio(linha) for linha in clientes]),
@@ -503,14 +586,15 @@ def relatorio_admin():
         ),
         ('Boletos atrasados', boletos_relatorio("WHERE UPPER(b.status_pagamento) = 'ATRASADO'")),
         ('Boletos pagos', boletos_relatorio("WHERE UPPER(b.status_pagamento) = 'PAGO'")),
-        ('Servicos prestados', relatorio_servicos()),
-        ('Novos servicos cadastrados', eventos_auditoria('criou', 'servico')),
-        ('Servicos atualizados', eventos_auditoria('editou', 'servico')),
+        ('Serviços prestados', relatorio_servicos()),
+        ('Novos serviços cadastrados', eventos_auditoria('criou', 'servico')),
+        ('Serviços atualizados', eventos_auditoria('editou', 'servico')),
         ('Novas vendas registradas', eventos_auditoria('registrou servico')),
     ]
 
 
 def relatorio_funcionario():
+    """Monta o relatorio operacional permitido para funcionarios."""
     return [
         ('Boletos em aberto', boletos_relatorio("WHERE UPPER(b.status_pagamento) = 'EM ABERTO'")),
         (
@@ -521,13 +605,19 @@ def relatorio_funcionario():
             ),
         ),
         ('Boletos atrasados', boletos_relatorio("WHERE UPPER(b.status_pagamento) = 'ATRASADO'")),
-        ('Servicos prestados', relatorio_servicos(incluir_cnpj=False)),
+        ('Serviços prestados', relatorio_servicos(incluir_cnpj=False)),
         ('Vendas registradas pela equipe', eventos_auditoria('registrou servico')),
     ]
 
 
 def relatorio_cliente(cnpj):
-    boletos = listar_boletos('WHERE c.cnpj = %s', (cnpj,), limite=500)
+    """Monta o relatorio individual de um cliente especifico."""
+    where_boletos, params_boletos = adicionar_filtro_relatorio(
+        'WHERE c.cnpj = %s',
+        'b.data_emissao >= %s',
+        (cnpj,),
+    )
+    boletos = listar_boletos(where_boletos, params_boletos, limite=500)
     servicos = relatorio_servicos(
         'WHERE c.cnpj = %s',
         (cnpj,),
@@ -546,11 +636,12 @@ def relatorio_cliente(cnpj):
             'Meus boletos atrasados',
             [normalizar_linha_relatorio(linha) for linha in boletos if str(linha.get('status_pagamento') or '').upper() == 'ATRASADO'],
         ),
-        ('Meus servicos utilizados', servicos),
+        ('Meus serviços utilizados', servicos),
     ]
 
 
 def criar_backup_automatico():
+    """Copia o SQLite e exporta tabelas MySQL para arquivos de backup."""
     pasta = BASE_DIR / 'backups'
     pasta.mkdir(exist_ok=True)
     carimbo = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -580,6 +671,7 @@ def criar_backup_automatico():
 
 
 def backup_esta_vencido():
+    """Verifica se ja passou o intervalo de 24 horas desde o ultimo backup."""
     marcador = BASE_DIR / 'backups' / 'ultimo_backup.txt'
     if not marcador.exists():
         return True
@@ -591,6 +683,7 @@ def backup_esta_vencido():
 
 
 def rotina_backup_24h():
+    """Executa em thread separada, checando periodicamente se precisa backup."""
     while True:
         try:
             if backup_esta_vencido():
@@ -601,43 +694,61 @@ def rotina_backup_24h():
 
 
 def iniciar_backup_automatico():
+    """Dispara o backup inicial e agenda a rotina em segundo plano."""
     if backup_esta_vencido():
         criar_backup_automatico()
     thread = threading.Thread(target=rotina_backup_24h, daemon=True)
     thread.start()
 
 
-def garantir_modelo_cliente_veiculo():
-    try:
-        execute_query('ALTER TABLE cliente MODIFY Veiculo_placa_veiculo CHAR(7) NULL')
-        execute_query('ALTER TABLE cliente MODIFY Fatura_id_Fatura INT NULL')
-        execute_query(
-            'CREATE TABLE IF NOT EXISTS cliente_veiculo ('
-            'cliente_cnpj CHAR(14) NOT NULL, '
-            'placa_veiculo CHAR(7) NOT NULL, '
-            'PRIMARY KEY (cliente_cnpj, placa_veiculo), '
-            'CONSTRAINT fk_cliente_veiculo_cliente FOREIGN KEY (cliente_cnpj) '
-            'REFERENCES cliente(cnpj) ON DELETE CASCADE ON UPDATE CASCADE, '
-            'CONSTRAINT fk_cliente_veiculo_veiculo FOREIGN KEY (placa_veiculo) '
-            'REFERENCES veiculo(placa_veiculo) ON DELETE CASCADE ON UPDATE CASCADE)'
-        )
-        execute_query(
-            'INSERT IGNORE INTO cliente_veiculo (cliente_cnpj, placa_veiculo) '
-            'SELECT cnpj, Veiculo_placa_veiculo FROM cliente WHERE Veiculo_placa_veiculo IS NOT NULL'
-        )
-    except Exception as exc:
-        logger_erro.exception(f'Nao foi possivel preparar vinculo cliente-veiculo: {exc}')
+def coluna_existe(tabela, coluna):
+    """Consulta o INFORMATION_SCHEMA para saber se uma coluna existe no MySQL."""
+    row = fetch_one(
+        'SELECT COUNT(*) AS total '
+        'FROM INFORMATION_SCHEMA.COLUMNS '
+        'WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+        (tabela, coluna),
+    )
+    return bool(row and row.get('total'))
 
 
+def validar_modelo_mysql():
+    """Falha cedo quando o schema conectado nao corresponde ao DER esperado."""
+    colunas_obrigatorias = {
+        'cliente': ('cnpj', 'Endereço_cep'),
+        'veiculo': ('placa_veiculo', 'cliente_cnpj'),
+        'serviço': (
+            'id_Serviço',
+            'serviço_utilizado_id_Serviço_utilizado',
+            'Veiculo_placa_veiculo',
+            'data_registro',
+        ),
+        'fatura': ('id_Fatura', 'serviço_id_Serviço', 'cliente_cnpj'),
+        'boleto': ('id_Boleto', 'Fatura_id_Fatura', 'status_pagamento'),
+    }
+    ausentes = [
+        f'{tabela}.{coluna}'
+        for tabela, colunas in colunas_obrigatorias.items()
+        for coluna in colunas
+        if not coluna_existe(tabela, coluna)
+    ]
+    if ausentes:
+        raise RuntimeError(f'Schema MySQL incompatível. Colunas ausentes: {", ".join(ausentes)}')
+
+
+# Rotinas executadas na inicializacao para preparar senhas, banco e backup.
 migrar_senhas_para_hash()
-garantir_modelo_cliente_veiculo()
+validar_modelo_mysql()
 iniciar_backup_automatico()
 
 
 def login_obrigatorio(*perfis):
+    """Decorator que restringe rotas aos perfis informados."""
     def decorator(func):
+        """Recebe a funcao da rota que sera protegida."""
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Valida o perfil em sessao antes de executar a rota."""
             if session.get('tipo') not in perfis:
                 return redirect(url_for('login', tipo=perfis[0] if perfis else 'cliente'))
             return func(*args, **kwargs)
@@ -648,6 +759,7 @@ def login_obrigatorio(*perfis):
 @app.route('/relatorios/<perfil>/<formato>')
 @login_obrigatorio('admin', 'funcionario', 'cliente')
 def exportar_relatorio(perfil, formato):
+    """Exporta relatorios em CSV ou PDF respeitando o perfil logado."""
     usuario_tipo = session.get('tipo')
     perfil = perfil.lower()
     formato = formato.lower()
@@ -681,6 +793,7 @@ def exportar_relatorio(perfil, formato):
 
 
 def enviar_email(assunto, corpo, destinatario=None):
+    """Envia e-mail via SMTP usando as configuracoes do arquivo .env."""
     host = os.getenv('MAIL_HOST')
     usuario = os.getenv('MAIL_USER')
     senha = os.getenv('MAIL_PASSWORD')
@@ -705,6 +818,7 @@ def enviar_email(assunto, corpo, destinatario=None):
 
 
 def carregar_precos_base():
+    """Carrega a tabela de servicos/precos cadastrada no MySQL."""
     try:
         rows = fetch_all(
             'SELECT `id_Serviço_utilizado` AS id, nome, descrição AS descricao, '
@@ -717,6 +831,7 @@ def carregar_precos_base():
 
 
 def resumo_boletos(where='', params=None):
+    """Calcula totais de boletos por status para os cards dos dashboards."""
     query = (
         'SELECT '
         'COUNT(*) AS total_boletos, '
@@ -725,9 +840,8 @@ def resumo_boletos(where='', params=None):
         "SUM(CASE WHEN UPPER(b.status_pagamento) = 'ATRASADO' THEN 1 ELSE 0 END) AS boletos_atrasados "
         'FROM boleto b '
         'JOIN fatura f ON f.id_Fatura = b.Fatura_id_Fatura '
-        'JOIN `serviço` s ON s.id_Serviço = f.Serviço_id_Serviço '
-        'JOIN cliente_veiculo cv ON cv.placa_veiculo = s.Veiculo_placa_veiculo '
-        'JOIN cliente c ON c.cnpj = cv.cliente_cnpj '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN cliente c ON c.cnpj = f.cliente_cnpj '
         f'{where}'
     )
     row = fetch_one(query, params or ())
@@ -740,16 +854,16 @@ def resumo_boletos(where='', params=None):
 
 
 def listar_boletos(where='', params=None, limite=20):
+    """Lista boletos com dados de cliente, veiculo e servico relacionado."""
     query = (
         'SELECT b.id_Boleto, b.data_vencimento, b.data_emissao, b.codigo_barras, b.status_pagamento, '
         'c.razao_social, c.cnpj, s.Veiculo_placa_veiculo AS placa_veiculo, '
         'su.nome AS servico, su.valor_unitario, su.desconto '
         'FROM boleto b '
         'JOIN fatura f ON f.id_Fatura = b.Fatura_id_Fatura '
-        'JOIN `serviço` s ON s.id_Serviço = f.Serviço_id_Serviço '
-        'JOIN cliente_veiculo cv ON cv.placa_veiculo = s.Veiculo_placa_veiculo '
-        'JOIN cliente c ON c.cnpj = cv.cliente_cnpj '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN cliente c ON c.cnpj = f.cliente_cnpj '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
         f'{where} '
         'ORDER BY b.data_vencimento DESC '
         f'LIMIT {int(limite)}'
@@ -758,19 +872,21 @@ def listar_boletos(where='', params=None, limite=20):
 
 
 def faturamento_estimado():
+    """Soma o valor estimado de todos os servicos registrados."""
     row = fetch_one(
         'SELECT SUM(s.qunt_utilizada * GREATEST(su.valor_unitario - COALESCE(su.desconto, 0), 0)) AS total '
         'FROM `serviço` s '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado'
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado'
     )
     return row.get('total') or Decimal('0')
 
 
 def servicos_mais_utilizados():
+    """Agrupa servicos por popularidade para exibir graficos/resumos."""
     rows = fetch_all(
         'SELECT su.nome, COUNT(*) AS total '
         'FROM `serviço` s '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
         'GROUP BY su.nome ORDER BY total DESC'
     )
     soma = sum(int(row['total'] or 0) for row in rows) or 1
@@ -784,6 +900,7 @@ def servicos_mais_utilizados():
     ]
 
 
+# Periodos disponiveis para filtrar o historico no dashboard do cliente.
 PERIODOS_CLIENTE = {
     '30': {'label': 'Últimos 30 dias', 'dias': 30},
     '90': {'label': 'Últimos 90 dias', 'dias': 90},
@@ -794,6 +911,7 @@ PERIODOS_CLIENTE = {
 
 
 def decimal_seguro(valor):
+    """Converte valores para Decimal sem quebrar quando vierem vazios."""
     try:
         return Decimal(str(valor or 0))
     except Exception:
@@ -801,11 +919,31 @@ def decimal_seguro(valor):
 
 
 def gerar_codigo_barras_demonstracao(fatura_id):
+    """Gera um codigo de barras ficticio para boletos demonstrativos."""
     base = f'23790{date.today().strftime("%Y%m%d")}{int(fatura_id):031d}'
     return somente_digitos(base)[:44].ljust(44, '0')
 
 
+def criar_boleto_para_fatura(fatura_id, vencimento=None, status='EM ABERTO'):
+    """Cria boleto para uma fatura, evitando duplicidade."""
+    boleto = fetch_one(
+        'SELECT id_Boleto FROM boleto WHERE Fatura_id_Fatura=%s',
+        (fatura_id,),
+    )
+    if boleto:
+        return None
+
+    vencimento = vencimento or (date.today() + timedelta(days=10)).isoformat()
+    execute_query(
+        'INSERT INTO boleto (data_vencimento, data_emissao, codigo_barras, status_pagamento, Fatura_id_Fatura) '
+        'VALUES (%s, %s, %s, %s, %s)',
+        (vencimento, date.today().isoformat(), gerar_codigo_barras_demonstracao(fatura_id), status, fatura_id),
+    )
+    return fatura_id
+
+
 def listar_resumos_mensais(cliente_busca='', competencia='', limite=24):
+    """Agrupa faturamento mensal por cliente e competencia."""
     condicoes = []
     params = []
     if cliente_busca:
@@ -824,10 +962,9 @@ def listar_resumos_mensais(cliente_busca='', competencia='', limite=24):
         'SUM(CASE WHEN b.id_Boleto IS NULL THEN 1 ELSE 0 END) AS faturas_sem_boleto, '
         'SUM(CASE WHEN b.id_Boleto IS NOT NULL THEN 1 ELSE 0 END) AS faturas_com_boleto '
         'FROM cliente c '
-        'JOIN cliente_veiculo cv ON cv.cliente_cnpj = c.cnpj '
-        'JOIN `serviço` s ON s.Veiculo_placa_veiculo = cv.placa_veiculo '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
-        'JOIN fatura f ON f.Serviço_id_Serviço = s.id_Serviço '
+        'JOIN fatura f ON f.cliente_cnpj = c.cnpj '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
         'LEFT JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
         f'{where} '
         'GROUP BY c.cnpj, c.razao_social, DATE_FORMAT(s.data_registro, %s) '
@@ -838,39 +975,25 @@ def listar_resumos_mensais(cliente_busca='', competencia='', limite=24):
 
 
 def listar_itens_resumo_mensal(cnpj, competencia):
+    """Detalha cada lancamento que forma o extrato mensal de um cliente."""
     return fetch_all(
-        'SELECT su.nome AS servico, COUNT(*) AS registros, SUM(s.qunt_utilizada) AS quantidade, '
-        'SUM(s.qunt_utilizada * GREATEST(su.valor_unitario - COALESCE(su.desconto, 0), 0)) AS subtotal '
-        'FROM cliente_veiculo cv '
-        'JOIN `serviço` s ON s.Veiculo_placa_veiculo = cv.placa_veiculo '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
-        'WHERE cv.cliente_cnpj = %s AND DATE_FORMAT(s.data_registro, %s) = %s '
-        'GROUP BY su.nome ORDER BY subtotal DESC',
-        (cnpj, '%Y-%m', competencia),
-    )
-
-
-def gerar_boletos_resumo_mensal(cnpj, competencia, vencimento):
-    faturas = fetch_all(
-        'SELECT f.id_Fatura AS id '
-        'FROM cliente_veiculo cv '
-        'JOIN `serviço` s ON s.Veiculo_placa_veiculo = cv.placa_veiculo '
-        'JOIN fatura f ON f.Serviço_id_Serviço = s.id_Serviço '
+        'SELECT s.id_Serviço AS id_servico, s.data_registro, '
+        's.Veiculo_placa_veiculo AS placa_veiculo, su.nome AS servico, '
+        's.qunt_utilizada AS quantidade, '
+        'GREATEST(su.valor_unitario - COALESCE(su.desconto, 0), 0) AS valor_unitario, '
+        's.qunt_utilizada * GREATEST(su.valor_unitario - COALESCE(su.desconto, 0), 0) AS subtotal, '
+        'COALESCE(b.status_pagamento, %s) AS status_pagamento '
+        'FROM fatura f '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
         'LEFT JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
-        'WHERE cv.cliente_cnpj = %s AND DATE_FORMAT(s.data_registro, %s) = %s AND b.id_Boleto IS NULL '
-        'ORDER BY f.id_Fatura',
-        (cnpj, '%Y-%m', competencia),
+        'WHERE f.cliente_cnpj = %s AND DATE_FORMAT(s.data_registro, %s) = %s '
+        'ORDER BY s.data_registro, s.id_Serviço',
+        ('SEM BOLETO', cnpj, '%Y-%m', competencia),
     )
-    for fatura in faturas:
-        execute_query(
-            'INSERT INTO boleto (data_vencimento, data_emissao, codigo_barras, status_pagamento, Fatura_id_Fatura) '
-            'VALUES (%s, %s, %s, %s, %s)',
-            (vencimento, date.today().isoformat(), gerar_codigo_barras_demonstracao(fatura['id']), 'EM ABERTO', fatura['id']),
-        )
-    return len(faturas)
-
 
 def calcular_resumo_cliente(servicos, boletos):
+    """Calcula totais e indicadores exibidos na area do cliente."""
     total_gasto = Decimal('0')
     total_quantidade = Decimal('0')
     uso_por_servico = {}
@@ -883,7 +1006,7 @@ def calcular_resumo_cliente(servicos, boletos):
 
         total_quantidade += quantidade
         total_gasto += quantidade * valor_final
-        nome = servico.get('nome') or 'Servico'
+        nome = servico.get('nome') or 'Serviço'
         uso_por_servico[nome] = uso_por_servico.get(nome, Decimal('0')) + quantidade
 
     maior_uso = max(uso_por_servico.values(), default=Decimal('1')) or Decimal('1')
@@ -925,6 +1048,7 @@ def calcular_resumo_cliente(servicos, boletos):
 
 
 def porcentagem_status(resumo):
+    """Adiciona percentuais de status ao dicionario de resumo de boletos."""
     total = int(resumo.get('total_boletos') or 0) or 1
     pago = int(resumo.get('boletos_pagos') or 0)
     aberto = int(resumo.get('boletos_abertos') or 0)
@@ -934,6 +1058,7 @@ def porcentagem_status(resumo):
 
 
 def boletos_por_status(status, limite=6):
+    """Busca uma pequena lista de boletos filtrados por status."""
     return listar_boletos(
         'WHERE UPPER(b.status_pagamento) = %s',
         (status.upper(),),
@@ -942,6 +1067,7 @@ def boletos_por_status(status, limite=6):
 
 
 def garantir_coluna_data_servico():
+    """Confere se a coluna data_registro existe na tabela de servicos."""
     try:
         coluna = fetch_one("SHOW COLUMNS FROM `serviço` LIKE 'data_registro'")
         if not coluna:
@@ -951,6 +1077,7 @@ def garantir_coluna_data_servico():
 
 
 def classe_status(status):
+    """Traduz o status do boleto para uma classe CSS usada nos templates."""
     status_normalizado = str(status or '').strip().upper()
     if status_normalizado == 'PAGO':
         return 'paid'
@@ -963,13 +1090,14 @@ app.jinja_env.globals['classe_status'] = classe_status
 
 
 def fatura_mais_recente_por_placa(placa):
+    """Encontra a fatura mais recente vinculada a uma placa."""
     placa = (placa or '').strip().upper()
     if not placa:
         return None
     row = fetch_one(
         'SELECT f.id_Fatura AS id '
         'FROM fatura f '
-        'JOIN `serviço` s ON s.id_Serviço = f.Serviço_id_Serviço '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
         'WHERE s.Veiculo_placa_veiculo = %s '
         'ORDER BY f.id_Fatura DESC LIMIT 1',
         (placa,),
@@ -977,85 +1105,170 @@ def fatura_mais_recente_por_placa(placa):
     return row.get('id') if row else None
 
 
-def listar_faturas_operacionais(limite=200):
+def listar_faturas_operacionais(limite=200, somente_sem_boleto=False):
+    """Lista faturas recentes, opcionalmente apenas as que nao tem boleto."""
+    where = 'WHERE b.id_Boleto IS NULL ' if somente_sem_boleto else ''
     return fetch_all(
         'SELECT f.id_Fatura AS id, c.razao_social, c.cnpj, s.Veiculo_placa_veiculo AS placa, '
-        'su.nome AS servico, s.data_registro '
+        'su.nome AS servico, s.data_registro, b.id_Boleto AS boleto_id '
         'FROM fatura f '
-        'JOIN `serviço` s ON s.id_Serviço = f.Serviço_id_Serviço '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
-        'LEFT JOIN cliente_veiculo cv ON cv.placa_veiculo = s.Veiculo_placa_veiculo '
-        'LEFT JOIN cliente c ON c.cnpj = cv.cliente_cnpj '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
+        'LEFT JOIN cliente c ON c.cnpj = f.cliente_cnpj '
+        'LEFT JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
+        f'{where}'
         'ORDER BY f.id_Fatura DESC LIMIT %s',
         (int(limite),),
     )
 
 
+def cliente_bloqueado_por_inadimplencia(cnpj):
+    """Verifica se o cliente possui boleto vencido ha mais de dois meses."""
+    cnpj = somente_digitos(cnpj)
+    if not cnpj:
+        return None
+    return fetch_one(
+        'SELECT b.id_Boleto, b.data_vencimento, b.status_pagamento, c.razao_social '
+        'FROM boleto b '
+        'JOIN fatura f ON f.id_Fatura = b.Fatura_id_Fatura '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN cliente c ON c.cnpj = f.cliente_cnpj '
+        'WHERE c.cnpj = %s '
+        "AND UPPER(b.status_pagamento) <> 'PAGO' "
+        'AND b.data_vencimento < DATE_SUB(CURDATE(), INTERVAL 2 MONTH) '
+        'ORDER BY b.data_vencimento ASC LIMIT 1',
+        (cnpj,),
+    )
+
+
 def salvar_veiculos_cliente(cnpj, veiculos):
+    """Insere ou atualiza os veiculos associados a um cliente."""
     if not veiculos:
         raise ValueError('Informe pelo menos uma placa para o cliente.')
     for veiculo in veiculos:
         execute_query(
-            'INSERT INTO veiculo (placa_veiculo, modelo, Ano_veiculo) VALUES (%s, %s, %s) '
-            'ON DUPLICATE KEY UPDATE modelo=VALUES(modelo), Ano_veiculo=VALUES(Ano_veiculo)',
-            (veiculo['placa'], veiculo['modelo'], veiculo['ano']),
-        )
-    execute_query('DELETE FROM cliente_veiculo WHERE cliente_cnpj=%s', (cnpj,))
-    for veiculo in veiculos:
-        execute_query(
-            'INSERT IGNORE INTO cliente_veiculo (cliente_cnpj, placa_veiculo) VALUES (%s, %s)',
-            (cnpj, veiculo['placa']),
+            'INSERT INTO veiculo (placa_veiculo, cliente_cnpj, modelo, Ano_veiculo) VALUES (%s, %s, %s, %s) '
+            'ON DUPLICATE KEY UPDATE cliente_cnpj=VALUES(cliente_cnpj), modelo=VALUES(modelo), Ano_veiculo=VALUES(Ano_veiculo)',
+            (veiculo['placa'], cnpj, veiculo['modelo'], veiculo['ano']),
         )
     return veiculos[0]['placa']
 
 
+def validar_dados_cliente(cnpj, dados, veiculos, cep=None):
+    """Valida limites do DER antes de iniciar o cadastro administrativo."""
+    razao_social, telefone, email = dados
+    if len(cnpj) != 14:
+        raise ValueError('Informe um CNPJ com 14 dígitos.')
+    if not razao_social:
+        raise ValueError('Informe a razão social do cliente.')
+    if len(razao_social) > 30:
+        raise ValueError('A razão social deve ter no máximo 30 caracteres.')
+    if len(telefone) > 11:
+        raise ValueError('O telefone deve ter no máximo 11 dígitos.')
+    if len(email) > 30:
+        raise ValueError('O e-mail deve ter no máximo 30 caracteres.')
+    if not veiculos:
+        raise ValueError('Informe pelo menos uma placa para o cliente.')
+    for veiculo in veiculos:
+        if len(veiculo['placa']) != 7:
+            raise ValueError('Cada placa deve possuir 7 caracteres.')
+        if len(veiculo['modelo']) > 28:
+            raise ValueError('O modelo do veículo deve ter no máximo 28 caracteres.')
+    if cep is not None:
+        if len(cep) != 8:
+            raise ValueError('Informe um CEP com 8 dígitos.')
+
+
+def garantir_endereco_cliente(cep):
+    """Cria um endereco pendente quando o CEP ainda nao existe."""
+    execute_query(
+        'INSERT INTO `endereço` (cep, logradouro, cidade, uf) VALUES (%s, NULL, %s, %s) '
+        'ON DUPLICATE KEY UPDATE cep=VALUES(cep)',
+        (cep, 'PENDENTE', '--'),
+    )
+
+
+def criar_login_cliente(cnpj, razao_social, email):
+    """Cria o acesso local inicial para um novo cliente cadastrado pelo admin."""
+    senha_inicial = 'Cliente@123'
+    with get_connection() as conexao:
+        existente = conexao.execute(
+            "SELECT id FROM usuarios WHERE documento = ? AND tipo = 'cliente'",
+            (cnpj,),
+        ).fetchone()
+        if existente:
+            conexao.execute(
+                'UPDATE usuarios SET nome = ?, email = ?, ativo = 1 WHERE id = ?',
+                (razao_social, email or None, existente['id']),
+            )
+            conexao.commit()
+            return False
+        conexao.execute(
+            'INSERT INTO usuarios (nome, email, documento, senha, tipo, ativo) '
+            "VALUES (?, ?, ?, ?, 'cliente', 1)",
+            (razao_social, email or None, cnpj, generate_password_hash(senha_inicial)),
+        )
+        conexao.commit()
+    return True
+
+
 @app.route('/')
 def home():
+    """Renderiza a pagina inicial publica."""
     return render_template('index.html')
 
 
 @app.route('/sobre')
 def sobre():
+    """Renderiza a pagina institucional sobre o posto."""
     return render_template('sobre.html')
 
 
 @app.route('/servicos')
 def servicos():
+    """Mostra a pagina geral de servicos com precos vindos do banco."""
     return render_template('servicos.html', precos=carregar_precos_base())
 
 
 @app.route('/servicos/combustivel')
 def servico_combustivel():
+    """Mostra a pagina detalhada dos combustiveis."""
     return render_template('servicos/combustivel.html', itens=SERVICOS_DETALHADOS['combustivel'])
 
 
 @app.route('/servicos/lavagem')
 def servico_lavagem():
+    """Mostra a pagina detalhada dos servicos de lavagem."""
     return render_template('servicos/lavagem.html', itens=SERVICOS_DETALHADOS['lavagem'])
 
 
 @app.route('/servicos/estacionamento')
 def servico_estacionamento():
+    """Mostra a pagina detalhada de estacionamento."""
     return render_template('servicos/estacionamento.html', itens=SERVICOS_DETALHADOS['estacionamento'])
 
 
 @app.route('/esg')
 def esg():
+    """Renderiza a pagina ESG/sustentabilidade."""
     return render_template('esg.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Autentica admin, funcionario ou cliente e grava os dados na sessao."""
     tipo = request.args.get('tipo', 'cliente')
     erro = None
 
     if request.method == 'POST':
+        # O mesmo formulario atende perfis internos e clientes.
         tipo = request.form.get('tipo', 'cliente')
         identificador = request.form.get('cnpj', '').strip()
         senha = request.form.get('senha', '')
         logger_acesso.info(f'Tentativa de login - perfil={tipo}, ip={request.remote_addr}')
 
         if tipo in ['admin', 'funcionario']:
+            # Admin e funcionario usam o banco local de usuarios.
             with get_connection() as conexao:
                 usuario = conexao.execute(
                     'SELECT * FROM usuarios WHERE nome = ? AND tipo = ? AND ativo = 1',
@@ -1070,6 +1283,7 @@ def login():
             erro = 'Identificador ou senha incorretos para o acesso interno.'
 
         elif tipo == 'cliente':
+            # Cliente entra com CNPJ e tambem precisa existir no MySQL.
             cnpj = somente_digitos(identificador)
             with get_connection() as conexao:
                 usuario = conexao.execute(
@@ -1087,13 +1301,14 @@ def login():
                     return redirect(url_for('dashboard_cliente'))
                 erro = 'Cadastro local encontrado, mas o cliente nao existe no MySQL.'
             else:
-                erro = 'CNPJ ou senha incorretos para a Area do Cliente.'
+                erro = 'CNPJ ou senha incorretos para a Área do Cliente.'
 
     return render_template('login.html', tipo=tipo, erro=erro)
 
 
 @app.route('/redefinir-senha', methods=['GET', 'POST'])
 def redefinir_senha():
+    """Fluxo demonstrativo de validacao para redefinicao de senha."""
     enviado = False
     erro = ''
     cnpj = ''
@@ -1102,6 +1317,7 @@ def redefinir_senha():
     etapa = request.form.get('etapa', 'cnpj')
 
     if request.method == 'POST':
+        # Primeiro confirma se o CNPJ existe; depois valida o e-mail cadastrado.
         cnpj = somente_digitos(request.form.get('cnpj'))
         cliente = fetch_one('SELECT cnpj, razao_social, email FROM cliente WHERE cnpj = %s', (cnpj,))
 
@@ -1136,17 +1352,20 @@ def redefinir_senha():
 
 @app.route('/logout')
 def logout():
+    """Limpa a sessao e leva o usuario de volta para a pagina inicial."""
     session.clear()
     return redirect(url_for('home'))
 
 
 @app.route('/contato', methods=['GET', 'POST'])
 def contato():
+    """Recebe mensagens do formulario de contato e tenta notificar por e-mail."""
     enviado = False
     erro_envio = ''
     aviso_envio = ''
 
     if request.method == 'POST':
+        # Normaliza os dados antes de salvar e montar o corpo do e-mail.
         contato_dados = {
             'nome': request.form.get('nome', '').strip(),
             'email': request.form.get('email', '').strip(),
@@ -1184,16 +1403,19 @@ def contato():
 @app.route('/admin/dashboard', methods=['GET', 'POST'])
 @login_obrigatorio('admin')
 def dashboard_admin():
+    """Painel administrativo para clientes, servicos, boletos e relatorios."""
     mensagem = ''
     erro = ''
     painel_ativo = request.args.get('painel', 'dashboard')
 
     if request.method == 'POST':
+        # O campo acao define qual operacao administrativa sera executada.
         acoes = request.form.getlist('acao')
         acao = acoes[-1] if acoes else ''
         painel_ativo = request.form.get('painel', painel_ativo)
         try:
             if acao == 'salvar_servico':
+                # Cria um novo servico ou atualiza um servico existente.
                 servico_id = request.form.get('servico_id')
                 nome = request.form.get('nome', '').strip()
                 descricao = request.form.get('descricao', '').strip()
@@ -1205,7 +1427,7 @@ def dashboard_admin():
                         'WHERE `id_Serviço_utilizado`=%s',
                         (nome, descricao, valor, desconto, servico_id),
                     )
-                    mensagem = 'Servico atualizado com sucesso.'
+                    mensagem = 'Serviço atualizado com sucesso.'
                     logger_auditoria.info(f'Admin editou servico id={servico_id} nome={nome}')
                 else:
                     proximo = fetch_one(
@@ -1216,16 +1438,18 @@ def dashboard_admin():
                         '(`id_Serviço_utilizado`, nome, descrição, valor_unitario, desconto) VALUES (%s, %s, %s, %s, %s)',
                         (proximo, nome, descricao, valor, desconto),
                     )
-                    mensagem = 'Servico adicionado com sucesso.'
+                    mensagem = 'Serviço adicionado com sucesso.'
                     logger_auditoria.info(f'Admin criou servico id={proximo} nome={nome}')
 
             elif acao == 'excluir_servico':
+                # Remove um servico cadastrado, se nao houver bloqueio relacional.
                 servico_id = request.form.get('servico_id')
                 execute_query('DELETE FROM `serviço_utilizado` WHERE `id_Serviço_utilizado`=%s', (servico_id,))
-                mensagem = 'Servico excluido com sucesso.'
+                mensagem = 'Serviço excluído com sucesso.'
                 logger_auditoria.info(f'Admin excluiu servico id={servico_id}')
 
             elif acao == 'salvar_cliente':
+                # Cria ou atualiza cliente e sincroniza seus veiculos.
                 cnpj = somente_digitos(request.form.get('cnpj'))
                 cnpj_original = somente_digitos(request.form.get('cnpj_original'))
                 dados = (
@@ -1233,18 +1457,12 @@ def dashboard_admin():
                     somente_digitos(request.form.get('telefone')),
                     request.form.get('email', '').strip(),
                 )
-                veiculos = parse_veiculos_formulario(
-                    request.form.get('placas'),
-                    request.form.get('modelo_veiculo'),
-                    request.form.get('ano_veiculo'),
-                )
+                veiculos = parse_veiculos_request(request.form)
                 if cnpj_original:
+                    validar_dados_cliente(cnpj_original, dados, veiculos)
                     placa_principal = salvar_veiculos_cliente(cnpj_original, veiculos) if veiculos else None
                     campos = 'razao_social=%s, telefone=%s, email=%s'
                     valores = [*dados]
-                    if placa_principal:
-                        campos += ', Veiculo_placa_veiculo=%s'
-                        valores.append(placa_principal)
                     valores.append(cnpj_original)
                     execute_query(
                         f'UPDATE cliente SET {campos} WHERE cnpj=%s',
@@ -1253,21 +1471,13 @@ def dashboard_admin():
                     mensagem = 'Cliente atualizado com sucesso.'
                     logger_auditoria.info(f'Admin editou cliente {mascarar_cnpj(cnpj_original)}')
                 else:
-                    placa = veiculos[0]['placa'] if veiculos else ''
-                    if not veiculos:
-                        erro = 'Informe pelo menos uma placa para adicionar o cliente.'
-                    else:
-                        for veiculo in veiculos:
-                            execute_query(
-                                'INSERT INTO veiculo (placa_veiculo, modelo, Ano_veiculo) VALUES (%s, %s, %s) '
-                                'ON DUPLICATE KEY UPDATE modelo=VALUES(modelo), Ano_veiculo=VALUES(Ano_veiculo)',
-                                (veiculo['placa'], veiculo['modelo'], veiculo['ano']),
-                            )
-                        execute_query(
+                    cep = somente_digitos(request.form.get('cep'))
+                    validar_dados_cliente(cnpj, dados, veiculos, cep)
+                    garantir_endereco_cliente(cep)
+                    execute_query(
                         'INSERT INTO cliente '
-                        '(cnpj, razao_social, telefone, email, complemento, numero, `Endereço_cep`, '
-                        'Veiculo_placa_veiculo, Fatura_id_Fatura) '
-                        'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NULL)',
+                        '(cnpj, razao_social, telefone, email, complemento, numero, `Endereço_cep`) '
+                        'VALUES (%s, %s, %s, %s, %s, %s, %s)',
                         (
                             cnpj,
                             dados[0],
@@ -1275,27 +1485,30 @@ def dashboard_admin():
                             dados[2],
                             request.form.get('complemento', '').strip() or None,
                             request.form.get('numero') or None,
-                            somente_digitos(request.form.get('cep')),
-                            placa,
+                            cep,
                         ),
-                        )
-                        salvar_veiculos_cliente(cnpj, veiculos)
-                        mensagem = 'Cliente adicionado com sucesso.'
-                        logger_auditoria.info(f'Admin criou cliente {mascarar_cnpj(cnpj)}')
+                    )
+                    salvar_veiculos_cliente(cnpj, veiculos)
+                    login_criado = criar_login_cliente(cnpj, dados[0], dados[2])
+                    mensagem = 'Cliente adicionado com sucesso.'
+                    if login_criado:
+                        mensagem += f' Login inicial: {cnpj} | Senha: Cliente@123'
+                    logger_auditoria.info(f'Admin criou cliente {mascarar_cnpj(cnpj)}')
 
             elif acao == 'excluir_cliente':
+                # Exclui o cliente pelo CNPJ informado no formulario.
                 cnpj = somente_digitos(request.form.get('cnpj'))
                 execute_query('DELETE FROM cliente WHERE cnpj=%s', (cnpj,))
-                mensagem = 'Cliente excluido com sucesso.'
+                mensagem = 'Cliente excluído com sucesso.'
                 logger_auditoria.info(f'Admin excluiu cliente {mascarar_cnpj(cnpj)}')
 
             elif acao == 'salvar_boleto':
+                # Atualiza um boleto gerado automaticamente com sua fatura.
                 boleto_id = request.form.get('boleto_id')
                 vencimento = request.form.get('data_vencimento')
                 emissao = request.form.get('data_emissao')
                 codigo = request.form.get('codigo_barras', '').strip()
                 status = request.form.get('status_pagamento', '').strip().upper()
-                fatura_id = request.form.get('fatura_id')
                 if boleto_id:
                     execute_query(
                         'UPDATE boleto SET data_vencimento=%s, data_emissao=%s, codigo_barras=%s, '
@@ -1305,36 +1518,22 @@ def dashboard_admin():
                     mensagem = 'Boleto atualizado com sucesso.'
                     logger_auditoria.info(f'Admin editou boleto id={boleto_id}')
                 else:
-                    execute_query(
-                        'INSERT INTO boleto (data_vencimento, data_emissao, codigo_barras, status_pagamento, Fatura_id_Fatura) '
-                        'VALUES (%s, %s, %s, %s, %s)',
-                        (vencimento, emissao, codigo, status, fatura_id),
-                    )
-                    mensagem = 'Boleto adicionado com sucesso.'
-                    logger_auditoria.info(f'Admin criou boleto fatura={fatura_id}')
+                    erro = 'Selecione um boleto existente para editar.'
 
             elif acao == 'excluir_boleto':
+                # Remove um boleto especifico.
                 boleto_id = request.form.get('boleto_id')
                 execute_query('DELETE FROM boleto WHERE id_Boleto=%s', (boleto_id,))
-                mensagem = 'Boleto excluido com sucesso.'
+                mensagem = 'Boleto excluído com sucesso.'
                 logger_auditoria.info(f'Admin excluiu boleto id={boleto_id}')
 
-            elif acao == 'gerar_boletos_mensais':
-                cnpj = somente_digitos(request.form.get('cnpj'))
-                competencia = request.form.get('competencia', '').strip()
-                vencimento = request.form.get('vencimento') or (date.today() + timedelta(days=10)).isoformat()
-                total_gerado = gerar_boletos_resumo_mensal(cnpj, competencia, vencimento)
-                if total_gerado:
-                    mensagem = f'{total_gerado} boleto(s) gerado(s) para o resumo mensal.'
-                    logger_auditoria.info(
-                        f'Admin gerou boletos mensais cliente={mascarar_cnpj(cnpj)} competencia={competencia} total={total_gerado}'
-                    )
-                else:
-                    erro = 'Este resumo mensal nao possui faturas pendentes para gerar boleto.'
+        except ValueError as exc:
+            erro = str(exc)
         except Exception as exc:
-            erro = 'Nao foi possivel concluir a operacao. Verifique se ha registros vinculados.'
+            erro = 'Não foi possível concluir a operação. Verifique se há registros vinculados.'
             logger_erro.exception(f'Erro admin: {exc}')
 
+    # Filtros usados para manter as buscas do dashboard administrativo.
     cliente_busca = request.args.get('cliente_busca', '').strip()
     boleto_busca = request.args.get('boleto_busca', '').strip()
     servico_busca = request.args.get('servico_busca', '').strip()
@@ -1344,12 +1543,14 @@ def dashboard_admin():
     if not re.fullmatch(r'\d{4}-\d{2}', competencia or ''):
         competencia = ''
 
+    # Indicadores principais exibidos no topo do painel.
     clientes_total = fetch_one('SELECT COUNT(*) AS total FROM cliente')['total']
     resumo = porcentagem_status(resumo_boletos())
     resumo['clientes'] = clientes_total
     resumo['faturamento'] = faturamento_estimado()
     resumo['servicos'] = servicos_mais_utilizados()
 
+    # Listagem de clientes, incluindo uma placa principal e a lista completa de veiculos.
     clientes_where = ''
     clientes_params = ()
     if cliente_busca:
@@ -1358,19 +1559,39 @@ def dashboard_admin():
 
     clientes = fetch_all(
         'SELECT c.cnpj, c.razao_social, c.telefone, c.email, c.complemento, c.numero, c.`Endereço_cep` AS cep, '
-        'c.Veiculo_placa_veiculo AS placa, v.modelo AS veiculo_modelo, v.Ano_veiculo AS veiculo_ano, '
-        'c.Fatura_id_Fatura AS fatura_id, '
-        '(SELECT GROUP_CONCAT(DISTINCT CONCAT(cv.placa_veiculo, '
-        "CASE WHEN vv.modelo IS NOT NULL THEN CONCAT(' - ', vv.modelo) ELSE '' END) SEPARATOR ', ') "
-        'FROM cliente_veiculo cv '
-        'LEFT JOIN veiculo vv ON vv.placa_veiculo = cv.placa_veiculo '
-        'WHERE cv.cliente_cnpj = c.cnpj) AS veiculos '
+        'principal.placa_veiculo AS placa, principal.modelo AS veiculo_modelo, principal.Ano_veiculo AS veiculo_ano, '
+        '(SELECT GROUP_CONCAT(DISTINCT CONCAT(vv.placa_veiculo, '
+        "CASE WHEN vv.modelo IS NOT NULL THEN CONCAT(' - ', vv.modelo) ELSE '' END, "
+        "CASE WHEN vv.Ano_veiculo IS NOT NULL THEN CONCAT(' - ', vv.Ano_veiculo) ELSE '' END) SEPARATOR ', ') "
+        'FROM veiculo vv '
+        'WHERE vv.cliente_cnpj = c.cnpj) AS veiculos '
         'FROM cliente c '
-        'LEFT JOIN veiculo v ON v.placa_veiculo = c.Veiculo_placa_veiculo '
+        'LEFT JOIN veiculo principal ON principal.placa_veiculo = ('
+        'SELECT v2.placa_veiculo FROM veiculo v2 WHERE v2.cliente_cnpj = c.cnpj ORDER BY v2.placa_veiculo LIMIT 1'
+        ') '
         f'{clientes_where} ORDER BY c.razao_social LIMIT 30',
         clientes_params,
     )
+    veiculos_por_cliente = {}
+    if clientes:
+        placeholders = ', '.join(['%s'] * len(clientes))
+        linhas_veiculos = fetch_all(
+            'SELECT v.cliente_cnpj AS cnpj, v.placa_veiculo AS placa, '
+            'v.modelo, v.Ano_veiculo AS ano '
+            'FROM veiculo v '
+            f'WHERE v.cliente_cnpj IN ({placeholders}) '
+            'ORDER BY v.cliente_cnpj, v.placa_veiculo',
+            tuple(cliente['cnpj'] for cliente in clientes),
+        )
+        for veiculo in linhas_veiculos:
+            veiculos_por_cliente.setdefault(veiculo['cnpj'], []).append(veiculo)
+    for cliente in clientes:
+        cliente['veiculos_lista'] = veiculos_por_cliente.get(cliente['cnpj'], [])
+    enderecos = fetch_all(
+        'SELECT cep, logradouro, cidade, uf FROM `endereço` ORDER BY cidade, logradouro, cep'
+    )
 
+    # Listagem de boletos e faturas disponiveis para operacoes manuais.
     boletos_where = ''
     boletos_params = ()
     if boleto_busca:
@@ -1379,7 +1600,6 @@ def dashboard_admin():
         )
         boletos_params = (f'%{boleto_busca}%', f'%{boleto_busca}%', f'%{boleto_busca}%', f'%{boleto_busca}%')
     boletos = listar_boletos(boletos_where, boletos_params, limite=30)
-    faturas_disponiveis = listar_faturas_operacionais()
     resumos_mensais = listar_resumos_mensais(faturamento_busca, competencia)
     for resumo_mensal in resumos_mensais:
         resumo_mensal['itens'] = listar_itens_resumo_mensal(
@@ -1387,6 +1607,7 @@ def dashboard_admin():
             resumo_mensal['competencia'],
         )
 
+    # Filtro local dos servicos cadastrados por nome ou descricao.
     precos = carregar_precos_base()
     if servico_busca:
         termo = servico_busca.lower()
@@ -1396,6 +1617,7 @@ def dashboard_admin():
             or termo in str(servico.get('descricao') or '').lower()
         ]
 
+    # Ultimos acessos lidos do arquivo de log.
     acessos = []
     log_path = BASE_DIR / 'logs' / 'acesso.log'
     if log_path.exists():
@@ -1410,8 +1632,8 @@ def dashboard_admin():
         resumo=resumo,
         precos=precos,
         clientes=clientes,
+        enderecos=enderecos,
         boletos=boletos,
-        faturas_disponiveis=faturas_disponiveis,
         boletos_pagos=boletos_por_status('PAGO'),
         boletos_abertos=boletos_por_status('EM ABERTO'),
         boletos_atrasados=boletos_por_status('ATRASADO'),
@@ -1425,7 +1647,6 @@ def dashboard_admin():
             'competencia': competencia,
         },
         resumos_mensais=resumos_mensais,
-        vencimento_padrao=(date.today() + timedelta(days=10)).isoformat(),
         painel_ativo=painel_ativo,
         mensagem=mensagem,
         erro=erro,
@@ -1435,11 +1656,13 @@ def dashboard_admin():
 @app.route('/funcionario/dashboard', methods=['GET', 'POST'])
 @login_obrigatorio('funcionario')
 def dashboard_funcionario():
+    """Painel operacional para consulta de clientes e registro de servicos."""
     mensagem = ''
     erro = ''
     garantir_coluna_data_servico()
 
     if request.method == 'POST':
+        # Registro de servico: cliente + veiculo + tipo + quantidade + data.
         cnpj = somente_digitos(request.form.get('cnpj'))
         placa_veiculo = ''.join(
             caractere for caractere in (request.form.get('placa_veiculo') or '').upper()
@@ -1449,11 +1672,12 @@ def dashboard_funcionario():
         quantidade = Decimal(request.form.get('quantidade', '1').replace(',', '.'))
         data_registro = request.form.get('data_registro') or date.today().isoformat()
         try:
+            # Confere se a placa realmente pertence ao CNPJ informado.
             cliente = fetch_one(
-                'SELECT base.cnpj, base.razao_social, cv.placa_veiculo AS Veiculo_placa_veiculo '
+                'SELECT base.cnpj, base.razao_social, v.placa_veiculo AS Veiculo_placa_veiculo '
                 'FROM cliente base '
-                'JOIN cliente_veiculo cv ON cv.cliente_cnpj = base.cnpj '
-                'WHERE base.cnpj = %s AND cv.placa_veiculo = %s '
+                'JOIN veiculo v ON v.cliente_cnpj = base.cnpj '
+                'WHERE base.cnpj = %s AND v.placa_veiculo = %s '
                 'LIMIT 1',
                 (cnpj, placa_veiculo),
             )
@@ -1461,20 +1685,33 @@ def dashboard_funcionario():
                 erro = 'Cliente ou veículo não encontrado para registrar o serviço.'
             elif not placa_veiculo:
                 erro = 'Selecione um veículo cadastrado para este cliente.'
+            elif (bloqueio := cliente_bloqueado_por_inadimplencia(cnpj)):
+                vencimento = bloqueio.get('data_vencimento')
+                vencimento_texto = vencimento.strftime('%d/%m/%Y') if hasattr(vencimento, 'strftime') else str(vencimento)
+                erro = (
+                    'Cliente bloqueado por inadimplência. '
+                    f'Existe boleto não pago vencido em {vencimento_texto}, há mais de 2 meses.'
+                )
+                logger_auditoria.info(
+                    f'Registro de servico bloqueado por inadimplencia cliente={mascarar_cnpj(cnpj)} '
+                    f'boleto={bloqueio.get("id_Boleto")}'
+                )
             else:
+                # Cada servico registrado gera uma fatura e um boleto demonstrativo.
                 servico_registrado_id = execute_insert_id(
                     'INSERT INTO `serviço` '
-                    '(qunt_utilizada, Serviço_utilizado_id_Serviço_utilizado, Veiculo_placa_veiculo, data_registro) '
+                    '(qunt_utilizada, serviço_utilizado_id_Serviço_utilizado, Veiculo_placa_veiculo, data_registro) '
                     'VALUES (%s, %s, %s, %s)',
                     (quantidade, servico_id, cliente['Veiculo_placa_veiculo'], data_registro),
                 )
                 proxima_fatura = fetch_one('SELECT COALESCE(MAX(id_Fatura), 0) + 1 AS id FROM fatura')['id']
                 execute_query(
-                    'INSERT INTO fatura (id_Fatura, Serviço_id_Serviço) VALUES (%s, %s)',
-                    (proxima_fatura, servico_registrado_id),
+                    'INSERT INTO fatura (id_Fatura, serviço_id_Serviço, cliente_cnpj) VALUES (%s, %s, %s)',
+                    (proxima_fatura, servico_registrado_id, cnpj),
                 )
+                criar_boleto_para_fatura(proxima_fatura)
                 mensagem = (
-                    f'Servico registrado para {cliente["razao_social"]} '
+                    f'Serviço registrado para {cliente["razao_social"]} '
                     f'no veículo {cliente["Veiculo_placa_veiculo"]}.'
                 )
                 logger_auditoria.info(
@@ -1485,6 +1722,7 @@ def dashboard_funcionario():
             erro = 'Não foi possível registrar o serviço.'
             logger_erro.exception(f'Erro funcionario: {exc}')
 
+    # Filtros que controlam as abas e consultas do painel do funcionario.
     busca = request.args.get('cliente', '').strip()
     boleto_busca = request.args.get('boleto_busca', '').strip()
     boleto_status = request.args.get('boleto_status', '').strip().upper()
@@ -1500,37 +1738,38 @@ def dashboard_funcionario():
         where = 'WHERE c.razao_social LIKE %s'
         params = (f'%{busca}%',)
 
+    # Lista resumida dos clientes para consulta operacional.
     clientes = fetch_all(
-        'SELECT c.cnpj, c.razao_social, c.telefone, c.email, c.Veiculo_placa_veiculo AS placa, '
-        'v.modelo AS veiculo_modelo, v.Ano_veiculo AS veiculo_ano, '
-        'COUNT(b.id_Boleto) AS total_boletos, '
+        'SELECT c.cnpj, c.razao_social, c.telefone, c.email, '
+        'principal.placa_veiculo AS placa, principal.modelo AS veiculo_modelo, principal.Ano_veiculo AS veiculo_ano, '
+        'COUNT(DISTINCT b.id_Boleto) AS total_boletos, '
         "SUM(CASE WHEN UPPER(b.status_pagamento) = 'EM ABERTO' THEN 1 ELSE 0 END) AS boletos_abertos "
         'FROM cliente c '
-        'LEFT JOIN veiculo v ON v.placa_veiculo = c.Veiculo_placa_veiculo '
-        'LEFT JOIN fatura f ON f.id_Fatura = c.Fatura_id_Fatura '
+        'LEFT JOIN veiculo principal ON principal.placa_veiculo = ('
+        'SELECT v2.placa_veiculo FROM veiculo v2 WHERE v2.cliente_cnpj = c.cnpj ORDER BY v2.placa_veiculo LIMIT 1'
+        ') '
+        'LEFT JOIN fatura f ON f.cliente_cnpj = c.cnpj '
         'LEFT JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
         f'{where} '
-        'GROUP BY c.cnpj, c.razao_social, c.telefone, c.email, c.Veiculo_placa_veiculo, v.modelo, v.Ano_veiculo '
+        'GROUP BY c.cnpj, c.razao_social, c.telefone, c.email, principal.placa_veiculo, principal.modelo, principal.Ano_veiculo '
         'ORDER BY c.razao_social',
         params,
     )
     for cliente in clientes:
         cliente['cnpj_mascarado'] = mascarar_cnpj(cliente['cnpj'])
 
+    # Dados usados pelo formulario de registro de servico.
     clientes_registro = fetch_all(
-        'SELECT c.cnpj, c.razao_social, c.Veiculo_placa_veiculo AS placa, '
-        'v.modelo AS veiculo_modelo, v.Ano_veiculo AS veiculo_ano '
+        'SELECT c.cnpj, c.razao_social '
         'FROM cliente c '
-        'LEFT JOIN veiculo v ON v.placa_veiculo = c.Veiculo_placa_veiculo '
         'ORDER BY c.razao_social'
     )
     todos_veiculos_cliente = fetch_all(
-        'SELECT c.cnpj, c.razao_social, cv.placa_veiculo AS placa, '
+        'SELECT c.cnpj, c.razao_social, v.placa_veiculo AS placa, '
         'v.modelo AS veiculo_modelo, v.Ano_veiculo AS veiculo_ano '
         'FROM cliente c '
-        'JOIN cliente_veiculo cv ON cv.cliente_cnpj = c.cnpj '
-        'LEFT JOIN veiculo v ON v.placa_veiculo = cv.placa_veiculo '
-        'ORDER BY c.razao_social, cv.placa_veiculo'
+        'JOIN veiculo v ON v.cliente_cnpj = c.cnpj '
+        'ORDER BY c.razao_social, v.placa_veiculo'
     )
     for cliente in clientes_registro:
         veiculos = []
@@ -1550,6 +1789,7 @@ def dashboard_funcionario():
             veiculos.append({'placa': placa, 'rotulo': ' - '.join(partes)})
         cliente['veiculos'] = veiculos
 
+    # Filtros de boletos combinam busca textual e status.
     resumo = porcentagem_status(resumo_boletos())
     boleto_condicoes = []
     boleto_params = []
@@ -1562,6 +1802,7 @@ def dashboard_funcionario():
     boletos_where = ''
     if boleto_condicoes:
         boletos_where = 'WHERE ' + ' AND '.join(boleto_condicoes)
+    # Decide qual aba fica ativa depois de buscas ou postagens.
     painel_ativo = 'visao-geral'
     if busca:
         painel_ativo = 'clientes'
@@ -1596,31 +1837,87 @@ def dashboard_funcionario():
     )
 
 
-@app.route('/cliente/dashboard')
+@app.route('/cliente/dashboard', methods=['GET', 'POST'])
 @login_obrigatorio('cliente')
 def dashboard_cliente():
+    """Area do cliente com boletos, servicos utilizados e indicadores."""
     cnpj = session.get('usuario_identificador')
+    mensagem = ''
+    erro = ''
+    endereco_cliente = fetch_one(
+        'SELECT c.cnpj, c.razao_social, c.telefone, c.email, '
+        'c.`Endereço_cep` AS cep, c.numero, c.complemento, '
+        'e.logradouro, e.cidade, e.uf '
+        'FROM cliente c JOIN `endereço` e ON e.cep = c.`Endereço_cep` '
+        'WHERE c.cnpj = %s',
+        (cnpj,),
+    )
+    if request.method == 'POST' and request.form.get('acao') == 'completar_endereco':
+        logradouro = request.form.get('logradouro', '').strip()
+        cidade = request.form.get('cidade', '').strip()
+        uf = request.form.get('uf', '').strip().upper()
+        numero = request.form.get('numero') or None
+        complemento = request.form.get('complemento', '').strip() or None
+        if not logradouro or not cidade or len(uf) != 2:
+            erro = 'Informe logradouro, cidade e UF com 2 letras.'
+        elif len(logradouro) > 48 or len(cidade) > 48:
+            erro = 'Logradouro e cidade devem ter no máximo 48 caracteres.'
+        else:
+            execute_query(
+                'UPDATE `endereço` e JOIN cliente c ON c.`Endereço_cep` = e.cep '
+                'SET e.logradouro=%s, e.cidade=%s, e.uf=%s '
+                'WHERE c.cnpj=%s',
+                (logradouro, cidade, uf, cnpj),
+            )
+            execute_query(
+                'UPDATE cliente SET numero=%s, complemento=%s WHERE cnpj=%s',
+                (numero, complemento, cnpj),
+            )
+            endereco_cliente = fetch_one(
+                'SELECT c.cnpj, c.razao_social, c.telefone, c.email, '
+                'c.`Endereço_cep` AS cep, c.numero, c.complemento, '
+                'e.logradouro, e.cidade, e.uf '
+                'FROM cliente c JOIN `endereço` e ON e.cep = c.`Endereço_cep` '
+                'WHERE c.cnpj = %s',
+                (cnpj,),
+            )
+            mensagem = 'Endereço atualizado com sucesso.'
+            logger_auditoria.info(f'Cliente completou endereco {mascarar_cnpj(cnpj)}')
+    endereco_pendente = bool(
+        endereco_cliente
+        and (
+            not endereco_cliente.get('logradouro')
+            or endereco_cliente.get('cidade') == 'PENDENTE'
+            or endereco_cliente.get('uf') == '--'
+        )
+    )
+    veiculos_cliente = fetch_all(
+        'SELECT placa_veiculo, modelo, Ano_veiculo AS ano '
+        'FROM veiculo WHERE cliente_cnpj = %s ORDER BY placa_veiculo',
+        (cnpj,),
+    )
     periodo_chave = request.args.get('periodo', '90')
     if periodo_chave not in PERIODOS_CLIENTE:
         periodo_chave = '90'
     periodo = PERIODOS_CLIENTE[periodo_chave]
 
+    # Monta filtros de periodo para boletos e servicos do cliente logado.
     where_boletos = 'WHERE c.cnpj = %s'
     where_servicos = 'WHERE c.cnpj = %s'
     if periodo['dias']:
         where_boletos += f' AND b.data_vencimento >= DATE_SUB(CURDATE(), INTERVAL {periodo["dias"]} DAY)'
         where_servicos += f' AND (b.data_vencimento IS NULL OR b.data_vencimento >= DATE_SUB(CURDATE(), INTERVAL {periodo["dias"]} DAY))'
 
+    # Busca boletos, encontra um boleto em aberto e calcula o resumo financeiro.
     boletos = listar_boletos(where_boletos, (cnpj,), limite=30)
     boleto_aberto = next((b for b in boletos if str(b['status_pagamento']).upper() == 'EM ABERTO'), None)
     servicos_cliente = fetch_all(
         'SELECT DISTINCT s.id_Serviço AS servico_id, su.nome, su.descrição AS descricao, '
         'su.valor_unitario, su.desconto, s.qunt_utilizada, s.data_registro '
-        'FROM cliente c '
-        'JOIN cliente_veiculo cv ON cv.cliente_cnpj = c.cnpj '
-        'JOIN `serviço` s ON s.Veiculo_placa_veiculo = cv.placa_veiculo '
-        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.Serviço_utilizado_id_Serviço_utilizado '
-        'LEFT JOIN fatura f ON f.Serviço_id_Serviço = s.id_Serviço '
+        'FROM fatura f '
+        'JOIN cliente c ON c.cnpj = f.cliente_cnpj '
+        'JOIN `serviço` s ON s.id_Serviço = f.serviço_id_Serviço '
+        'JOIN `serviço_utilizado` su ON su.id_Serviço_utilizado = s.serviço_utilizado_id_Serviço_utilizado '
         'LEFT JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
         f'{where_servicos} ORDER BY s.id_Serviço DESC LIMIT 30',
         (cnpj,),
@@ -1636,23 +1933,33 @@ def dashboard_cliente():
         periodo_atual=periodo_chave,
         periodo_label=periodo['label'],
         periodos=PERIODOS_CLIENTE,
+        cadastro=endereco_cliente,
+        veiculos=veiculos_cliente,
+        endereco=endereco_cliente,
+        endereco_pendente=endereco_pendente,
+        mensagem=mensagem,
+        erro=erro,
     )
 
 
 @app.errorhandler(404)
 def not_found(_):
-    return render_template('erro.html', erro='Pagina nao encontrada'), 404
+    """Pagina amigavel quando a rota nao existe."""
+    return render_template('erro.html', erro='Página não encontrada'), 404
 
 
 @app.errorhandler(500)
 def internal_error(_):
+    """Pagina amigavel para erros internos, registrando o problema no log."""
     logger_erro.exception('Erro interno do servidor')
     return render_template('erro.html', erro='Erro interno do servidor'), 500
 
 
 if __name__ == '__main__':
+    # Permite executar localmente com: python app.py
     app.run(
         debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true',
         host=os.getenv('HOST', '0.0.0.0'),
         port=int(os.getenv('PORT', '8001')),
     )
+

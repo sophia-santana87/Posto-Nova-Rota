@@ -1,3 +1,4 @@
+<!-- Painel da administradora: gerencia clientes, boletos, precos e relatorios. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -9,6 +10,7 @@
 </head>
 <body>
     <div class="app-layout dashboard-shell">
+        <!-- Barra lateral do administrador; os botoes trocam os paineis pelo JavaScript no fim do arquivo. -->
         <aside class="sidebar">
             <a class="dashboard-brand" href="{{ url_for('home') }}">
                 <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
@@ -17,6 +19,7 @@
             <button class="dashboard-menu-toggle" type="button" aria-expanded="false" aria-label="Abrir menu">
                 <span></span><span></span><span></span>
             </button>
+            <!-- painel_ativo vem do app.py e define qual aba abre marcada depois de buscas ou POST. -->
             <nav class="side-nav">
                 <button class="{{ 'active' if painel_ativo == 'dashboard' else '' }}" type="button" data-panel="dashboard">Dashboard</button>
                 <button class="{{ 'active' if painel_ativo == 'clientes' else '' }}" type="button" data-panel="clientes">Clientes</button>
@@ -28,6 +31,7 @@
                 <a href="{{ url_for('logout') }}">Sair</a>
             </nav>
         </aside>
+        <!-- Conteudo principal do dashboard administrativo. -->
         <main class="app-main">
             <header class="topbar">
                 <div>
@@ -37,10 +41,12 @@
                 <span>Bem-vindo, {{ usuario.nome }}</span>
             </header>
 
+            <!-- Mensagens de sucesso/erro sao definidas em dashboard_admin() apos cada operacao. -->
             {% if mensagem %}<div class="form-success dashboard-message"><strong>{{ mensagem }}</strong></div>{% endif %}
             {% if erro %}<div class="form-error dashboard-message"><strong>{{ erro }}</strong></div>{% endif %}
 
             <section class="dashboard admin-workspace">
+                <!-- Aba inicial: indicadores de clientes, faturamento, boletos e servicos. -->
                 <div class="employee-panel {{ 'active' if painel_ativo == 'dashboard' else '' }}" data-panel-content="dashboard">
                     <div class="metric-grid admin-metrics">
                         <article class="metric-card"><small>Clientes Ativos</small><strong>{{ resumo.clientes }}</strong><span>MySQL</span></article>
@@ -57,6 +63,7 @@
                                 <div class="status-hover paid">
                                     <span><i></i>Pagos: {{ resumo.boletos_pagos }}</span>
                                     <div class="status-popover">
+                                        <!-- O for/else do Jinja mostra registros quando existem e uma mensagem vazia quando nao existem. -->
                                         {% for boleto in boletos_pagos %}
                                             <strong>{{ boleto.razao_social }}</strong>
                                             <small>{{ boleto.data_vencimento.strftime('%d/%m/%Y') }} - {{ boleto.servico }}</small>
@@ -94,11 +101,12 @@
                             <h2>Serviços mais utilizados</h2>
                             <div class="service-usage-layout">
                                 <div class="progress-list">
+                                    <!-- Lista calculada em servicos_mais_utilizados(). -->
                                     {% for servico in resumo.servicos %}
                                         <div class="progress-row">
                                             <span>{{ servico.nome }}</span>
-                                            <div class="track"><i style="width: {{ servico.percentual }}%;"></i></div>
-                                            <strong>{{ servico.percentual }}%</strong>
+                                            <div class="track"><i style="width: {{ servico.percentual | default(0) }}%;"></i></div>
+                                            <strong>{{ servico.percentual | default(0) }}%</strong>
                                         </div>
                                     {% else %}
                                         <p class="empty-state">Nenhum serviço registrado.</p>
@@ -122,8 +130,10 @@
                     </div>
                 </div>
 
+                <!-- Aba Clientes: cadastro, busca, edicao inline e exclusao. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'clientes' else '' }}" data-panel-content="clientes">
                     <div class="panel-heading"><h2>Clientes</h2><p>Consulte, altere, adicione ou remova clientes.</p></div>
+                    <!-- Formulario de criacao de cliente enviado para dashboard_admin(). -->
                     <form method="post" class="dashboard-form compact-form add-form admin-create-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="painel" value="clientes">
@@ -132,14 +142,33 @@
                         <label><span>Razão social</span><input name="razao_social" required></label>
                         <label><span>Telefone</span><input name="telefone"></label>
                         <label><span>E-mail</span><input name="email"></label>
-                        <label><span>CEP existente</span><input name="cep" required></label>
-                        <label class="span-2"><span>Placas do cliente</span><textarea name="placas" rows="3" required placeholder="ABC1234&#10;DEF5678 - Caminhão Volvo - 2021"></textarea></label>
-                        <label><span>Modelo padrão</span><input name="modelo_veiculo" placeholder="Modelo do veículo"></label>
-                        <label><span>Ano padrão</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ current_year }}"></label>
+                        <label>
+                            <span>CEP</span>
+                            <input name="cep" list="ceps-existentes" placeholder="Digite o CEP" required>
+                        </label>
+                        <datalist id="ceps-existentes">
+                            {% for endereco in enderecos %}
+                                <option value="{{ endereco.cep }}">{{ endereco.logradouro }} - {{ endereco.cidade }}/{{ endereco.uf }}</option>
+                            {% endfor %}
+                        </datalist>
+                        <!-- data-vehicle-list e usado pelo JavaScript para adicionar/remover linhas de veiculo. -->
+                        <div class="vehicle-form-block span-2" data-vehicle-list>
+                            <div class="vehicle-form-head">
+                                <span>Veículos do cliente</span>
+                                <button class="btn small-btn" type="button" data-add-vehicle>Adicionar placa</button>
+                            </div>
+                            <div class="vehicle-form-row" data-vehicle-row>
+                                <label><span>Placa</span><input name="placa_veiculo" placeholder="ABC1234" maxlength="7" required></label>
+                                <label><span>Modelo</span><input name="modelo_veiculo" placeholder="Caminhão Volvo" required></label>
+                                <label><span>Ano</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ current_year }}" required></label>
+                                <button class="btn danger small-btn" type="button" data-remove-vehicle>Remover</button>
+                            </div>
+                        </div>
                         <label><span>Número</span><input name="numero" type="number"></label>
                         <label><span>Complemento</span><input name="complemento"></label>
                         <button class="btn btn-highlight" type="submit">Adicionar cliente</button>
                     </form>
+                    <!-- Busca por cliente via GET, preservando a navegacao por URL. -->
                     <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
                         <input type="hidden" name="painel" value="clientes">
                         <input type="search" name="cliente_busca" value="{{ filtros.cliente_busca }}" placeholder="Buscar por CNPJ, razão social ou e-mail">
@@ -151,6 +180,7 @@
                                 <tr><th>CNPJ</th><th>Razão social</th><th>Telefone</th><th>E-mail</th><th>Veículos encontrados</th><th>Ações</th></tr>
                             </thead>
                             <tbody>
+                                <!-- clientes vem da consulta SQL montada em dashboard_admin(). -->
                                 {% for cliente in clientes %}
                                     <tr>
                                         <td>{{ cliente.cnpj }}</td>
@@ -180,9 +210,27 @@
                                                 <label><span>Razão social</span><input name="razao_social" value="{{ cliente.razao_social or '' }}" required></label>
                                                 <label><span>Telefone</span><input name="telefone" value="{{ cliente.telefone or '' }}"></label>
                                                 <label><span>E-mail</span><input name="email" value="{{ cliente.email or '' }}"></label>
-                                                <label class="span-2"><span>Placas do cliente</span><textarea name="placas" rows="3">{{ cliente.veiculos or cliente.placa }}</textarea></label>
-                                                <label><span>Modelo padrão</span><input name="modelo_veiculo" value="{{ cliente.veiculo_modelo or '' }}"></label>
-                                                <label><span>Ano padrão</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ cliente.veiculo_ano or current_year }}"></label>
+                                                <div class="vehicle-form-block span-2" data-vehicle-list>
+                                                    <div class="vehicle-form-head">
+                                                        <span>Veículos do cliente</span>
+                                                        <button class="btn small-btn" type="button" data-add-vehicle>Adicionar placa</button>
+                                                    </div>
+                                                    {% for veiculo in cliente.veiculos_lista %}
+                                                        <div class="vehicle-form-row" data-vehicle-row>
+                                                            <label><span>Placa</span><input name="placa_veiculo" value="{{ veiculo.placa }}" maxlength="7" required></label>
+                                                            <label><span>Modelo</span><input name="modelo_veiculo" value="{{ veiculo.modelo or '' }}" required></label>
+                                                            <label><span>Ano</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ veiculo.ano or current_year }}" required></label>
+                                                            <button class="btn danger small-btn" type="button" data-remove-vehicle>Remover</button>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="vehicle-form-row" data-vehicle-row>
+                                                            <label><span>Placa</span><input name="placa_veiculo" value="{{ cliente.placa or '' }}" maxlength="7" required></label>
+                                                            <label><span>Modelo</span><input name="modelo_veiculo" value="{{ cliente.veiculo_modelo or '' }}" required></label>
+                                                            <label><span>Ano</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ cliente.veiculo_ano or current_year }}" required></label>
+                                                            <button class="btn danger small-btn" type="button" data-remove-vehicle>Remover</button>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
                                                 <button class="btn primary" type="submit">Salvar alterações</button>
                                             </form>
                                         </td>
@@ -195,37 +243,9 @@
                     </div>
                 </article>
 
+                <!-- Aba Boletos: permite editar status, vencimento e codigo dos boletos gerados automaticamente. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'boletos' else '' }}" data-panel-content="boletos">
-                    <div class="panel-heading"><h2>Boletos</h2><p>Filtre, altere status, datas e código de barras.</p></div>
-                    <form method="post" class="dashboard-form compact-form add-form admin-create-form boleto-create-form">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="painel" value="boletos">
-                        <input type="hidden" name="acao" value="salvar_boleto">
-                        <label><span>Cliente e serviço</span>
-                            <select name="fatura_id" required>
-                                <option value="">Selecione o faturamento</option>
-                                {% for fatura in faturas_disponiveis %}
-                                    <option value="{{ fatura.id }}">
-                                        {{ fatura.razao_social or 'Cliente não vinculado' }} - {{ fatura.servico }} - {{ fatura.placa }}{% if fatura.data_registro %} - {{ fatura.data_registro|data_hora_br }}{% endif %}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                        <label><span>Vencimento</span><input name="data_vencimento" type="date" required></label>
-                        <label><span>Emissão</span><input name="data_emissao" type="date" required></label>
-                        <label><span>Status</span>
-                            <select name="status_pagamento" required>
-                                <option>PAGO</option>
-                                <option>EM ABERTO</option>
-                                <option>ATRASADO</option>
-                            </select>
-                        </label>
-                        <label class="barcode-field">
-                            <span>Código de barras <small>43 ou 44 dígitos</small></span>
-                            <input name="codigo_barras" inputmode="numeric" pattern="[0-9]{43,44}" minlength="43" maxlength="44" placeholder="Digite 43 ou 44 dígitos" required>
-                        </label>
-                        <button class="btn btn-highlight" type="submit">Adicionar boleto</button>
-                    </form>
+                    <div class="panel-heading"><h2>Boletos</h2><p>Os boletos são gerados automaticamente ao registrar um serviço. Edite apenas quando necessário.</p></div>
                     <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
                         <input type="hidden" name="painel" value="boletos">
                         <input type="search" name="boleto_busca" value="{{ filtros.boleto_busca }}" placeholder="Buscar por cliente, CNPJ, serviço ou status">
@@ -290,8 +310,9 @@
                     </div>
                 </article>
 
+                <!-- Aba Faturamento: agrupamento mensal por cliente/competencia. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'faturamento' else '' }}" data-panel-content="faturamento">
-                    <div class="panel-heading"><h2>Faturamento mensal</h2><p>Resumo por cliente antes da geracao dos boletos.</p></div>
+                    <div class="panel-heading"><h2>Extrato mensal</h2><p>Consulte quanto cada cliente consumiu no mes e abra os lancamentos detalhados.</p></div>
                     <form class="admin-search monthly-filter-form" method="get" action="{{ url_for('dashboard_admin') }}">
                         <input type="hidden" name="painel" value="faturamento">
                         <input type="search" name="faturamento_busca" value="{{ filtros.faturamento_busca }}" placeholder="Buscar por cliente ou CNPJ">
@@ -299,34 +320,52 @@
                         <button class="btn primary" type="submit">Filtrar</button>
                     </form>
                     <div class="monthly-summary-grid">
+                        <!-- Cada card representa um cliente em uma competencia mensal. -->
                         {% for mensal in resumos_mensais %}
                             <section class="monthly-summary-card">
                                 <div class="monthly-summary-head">
                                     <div>
                                         <h3>{{ mensal.razao_social }}</h3>
-                                        <span>{{ mensal.competencia_label }} - {{ mensal.total_servicos }} servico(s)</span>
+                                        <span>{{ mensal.competencia_label }} - {{ mensal.total_servicos }} serviço(s)</span>
                                     </div>
                                     <strong>{{ mensal.total_mes|brl }}</strong>
                                 </div>
-                                <div class="monthly-summary-items">
-                                    {% for item in mensal.itens %}
-                                        <div>
-                                            <span>{{ item.servico }}</span>
-                                            <small>{{ item.quantidade }} un. - {{ item.subtotal|brl }}</small>
-                                        </div>
-                                    {% endfor %}
-                                </div>
                                 <div class="monthly-summary-footer">
-                                    <span>{{ mensal.faturas_sem_boleto or 0 }} pendente(s) / {{ mensal.faturas_com_boleto or 0 }} com boleto</span>
-                                    <form method="post" class="monthly-generate-form">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <input type="hidden" name="painel" value="faturamento">
-                                        <input type="hidden" name="acao" value="gerar_boletos_mensais">
-                                        <input type="hidden" name="cnpj" value="{{ mensal.cnpj }}">
-                                        <input type="hidden" name="competencia" value="{{ mensal.competencia }}">
-                                        <input name="vencimento" type="date" value="{{ vencimento_padrao }}" required>
-                                        <button class="btn btn-highlight small-btn" type="submit" {% if not mensal.faturas_sem_boleto %}disabled{% endif %}>Gerar boleto</button>
-                                    </form>
+                                    <span>Total a pagar no mes: <strong>{{ mensal.total_mes|brl }}</strong></span>
+                                    <button class="btn btn-highlight small-btn" type="button" data-monthly-detail-toggle="extrato-{{ loop.index }}">
+                                        Ver extrato detalhado
+                                    </button>
+                                </div>
+                                <div class="monthly-detail" data-monthly-detail="extrato-{{ loop.index }}" hidden>
+                                    <div class="table-frame">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Veiculo</th>
+                                                    <th>Servico</th>
+                                                    <th>Quantidade</th>
+                                                    <th>Valor unitario</th>
+                                                    <th>Subtotal</th>
+                                                    <th>Status do boleto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in mensal.itens %}
+                                                    <tr>
+                                                        <td>{{ item.data_registro.strftime('%d/%m/%Y') if item.data_registro else '-' }}</td>
+                                                        <td>{{ item.placa_veiculo }}</td>
+                                                        <td>{{ item.servico }}</td>
+                                                        <td>{{ item.quantidade }} un.</td>
+                                                        <td>{{ item.valor_unitario|brl }}</td>
+                                                        <td>{{ item.subtotal|brl }}</td>
+                                                        <td>{{ item.status_pagamento }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="monthly-detail-total">Total do mes: <strong>{{ mensal.total_mes|brl }}</strong></p>
                                 </div>
                             </section>
                         {% else %}
@@ -335,6 +374,7 @@
                     </div>
                 </article>
 
+                <!-- Aba Servicos: manutencao da tabela servico_utilizado. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'servicos' else '' }}" data-panel-content="servicos">
                     <div class="panel-heading"><h2>Serviços e preços</h2><p>Cadastre, altere e exclua valores dos serviços.</p></div>
                     <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
@@ -372,6 +412,7 @@
                     </div>
                 </article>
 
+                <!-- Aba Acessos: mostra linhas recentes do arquivo logs/acesso.log. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'acessos' else '' }}" data-panel-content="acessos">
                     <div class="panel-heading"><h2>Acessos</h2><p>Últimos registros do log de acesso do sistema.</p></div>
                     <form class="admin-search" method="get" action="{{ url_for('dashboard_admin') }}">
@@ -388,6 +429,7 @@
                     </div>
                 </article>
 
+                <!-- Aba Relatorios: links chamam /relatorios/<perfil>/<formato>. -->
                 <article class="content-panel employee-panel {{ 'active' if painel_ativo == 'relatorios' else '' }}" data-panel-content="relatorios">
                     <div class="panel-heading">
                         <h2>Relatórios</h2>
@@ -408,6 +450,7 @@
         </main>
     </div>
     <script>
+        // Alterna as abas do dashboard sem recarregar a pagina.
         document.querySelectorAll('[data-panel]').forEach((button) => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('[data-panel]').forEach((item) => item.classList.remove('active'));
@@ -419,12 +462,14 @@
             });
         });
 
+        // Abre/fecha o menu lateral em telas menores.
         document.querySelector('.dashboard-menu-toggle')?.addEventListener('click', (event) => {
             const sidebar = event.currentTarget.closest('.sidebar');
             const aberto = sidebar.classList.toggle('nav-open');
             event.currentTarget.setAttribute('aria-expanded', String(aberto));
         });
 
+        // Mostra a linha de edicao inline correspondente ao botao "Alterar".
         document.querySelectorAll('[data-edit-target]').forEach((button) => {
             button.addEventListener('click', () => {
                 const row = document.querySelector(`[data-edit-row="${button.dataset.editTarget}"]`);
@@ -432,6 +477,60 @@
                     row.classList.toggle('active');
                 }
             });
+        });
+
+        // Abre o extrato de lancamentos que compoe o total mensal do cliente.
+        document.querySelectorAll('[data-monthly-detail-toggle]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const detail = document.querySelector(`[data-monthly-detail="${button.dataset.monthlyDetailToggle}"]`);
+                if (!detail) return;
+                detail.hidden = !detail.hidden;
+                button.textContent = detail.hidden ? 'Ver extrato detalhado' : 'Fechar extrato';
+            });
+        });
+
+        // Permite adicionar/remover campos de veiculo nos formularios de cliente.
+        document.querySelectorAll('[data-vehicle-list]').forEach((list) => {
+            const addButton = list.querySelector('[data-add-vehicle]');
+
+            const refreshRemoveButtons = () => {
+                const rows = list.querySelectorAll('[data-vehicle-row]');
+                rows.forEach((row) => {
+                    const removeButton = row.querySelector('[data-remove-vehicle]');
+                    if (removeButton) {
+                        removeButton.disabled = rows.length === 1;
+                    }
+                });
+            };
+
+            const bindRow = (row) => {
+                const placaInput = row.querySelector('input[name="placa_veiculo"]');
+                placaInput?.addEventListener('input', () => {
+                    placaInput.value = placaInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+                });
+                row.querySelector('[data-remove-vehicle]')?.addEventListener('click', () => {
+                    if (list.querySelectorAll('[data-vehicle-row]').length > 1) {
+                        row.remove();
+                        refreshRemoveButtons();
+                    }
+                });
+            };
+
+            list.querySelectorAll('[data-vehicle-row]').forEach(bindRow);
+
+            addButton?.addEventListener('click', () => {
+                const baseRow = list.querySelector('[data-vehicle-row]');
+                if (!baseRow) return;
+                const newRow = baseRow.cloneNode(true);
+                newRow.querySelectorAll('input').forEach((input) => {
+                    input.value = input.name === 'ano_veiculo' ? '{{ current_year }}' : '';
+                });
+                baseRow.parentElement.appendChild(newRow);
+                bindRow(newRow);
+                refreshRemoveButtons();
+            });
+
+            refreshRemoveButtons();
         });
     </script>
 </body>

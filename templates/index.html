@@ -1,3 +1,4 @@
+<!-- Pagina inicial publica: apresenta o posto e direciona para servicos e login. -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -10,7 +11,9 @@
 <body>
     
     <div class="site-shell home-only">
+        <!-- Hero da pagina inicial: concentra navegacao, chamada principal e botao para servicos. -->
         <header class="hero full-hero" id="inicio">
+            <!-- Menu publico com links gerados pelas rotas Flask via url_for(). -->
             <nav class="site-nav">
                 <a class="brand" href="{{ url_for('home') }}" aria-label="Voltar para a página principal">
                     <img src="{{ url_for('static', filename='img/Logo-oficial.png') }}" alt="Posto Nova Rota">
@@ -30,6 +33,7 @@
 </div>
             </nav>
 
+            <!-- Texto principal da home, apresentado sobre a area visual do hero. -->
             <div class="hero-content">
                 <div class="hero-copy">
                     <h1>Mais que abastecimento.</h1>
@@ -41,6 +45,7 @@
                 </div>
             </div>
         </header>
+        <!-- Rodape reaproveitado em varias paginas publicas. -->
         {% include '_footer.html' %}
     </div>
 </body>

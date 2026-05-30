@@ -1,3 +1,6 @@
+/* Ajusta os paineis de admin, funcionario e cliente para telas menores.
+   As regras abaixo evitam que menu, tabelas e cards cubram o conteudo. */
+
 /* Layout responsivo dos dashboards internos.
    A sidebar fica dentro do fluxo flex para não cobrir o conteúdo principal. */
 
@@ -303,6 +306,11 @@
 
     .dashboard-form .span-2 {
         grid-column: auto !important;
+    }
+
+    .vehicle-form-row,
+    .vehicle-form-head {
+        grid-template-columns: 1fr !important;
     }
 
     .progress-row {
