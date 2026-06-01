@@ -1,9 +1,14 @@
 # Ambiente
+# Estes arquivos podem conter senhas, chaves e configuracoes especificas
+# de cada computador ou servidor. Nunca devem ser publicados no Git.
 .env
 .env.local
 .env.*.local
 
 # Python
+# Arquivos de cache, compilacao, pacotes gerados e ambientes virtuais.
+# Eles podem ser recriados a partir do codigo e do requirements.txt.
+# Ignora-los evita arquivos desnecessarios e diferencas entre computadores.
 __pycache__/
 *.py[cod]
 *$py.class
@@ -29,6 +34,8 @@ wheels/
 *.egg
 
 # IDE
+# Preferencias locais de editores como VS Code, IntelliJ e Vim.
+# Cada pessoa pode usar seu proprio editor sem alterar o repositorio.
 .vscode/
 .idea/
 *.swp
@@ -36,19 +43,27 @@ wheels/
 *~
 
 # Logs
+# Registros criados durante a execucao do sistema.
+# Eles mudam constantemente, podem ficar grandes e podem conter dados locais.
 logs/
 *.log
 
 # Banco de dados
+# Arquivos de bancos locais usados para desenvolvimento ou testes.
+# O banco oficial deve ser criado pelos scripts SQL, sem enviar dados locais.
 *.db
 *.sqlite
 *.sqlite3
 
 # Sistema
+# Arquivos auxiliares criados automaticamente pelo macOS e pelo Windows.
+# Eles nao fazem parte do projeto.
 .DS_Store
 Thumbs.db
 
 # Testes
+# Relatorios de cobertura e caches gerados ao executar testes automatizados.
+# Podem ser recriados quando necessario.
 .coverage
 .pytest_cache/
 htmlcov/

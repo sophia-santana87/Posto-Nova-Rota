@@ -1154,29 +1154,64 @@ def salvar_veiculos_cliente(cnpj, veiculos):
     return veiculos[0]['placa']
 
 
+class ErroValidacaoCliente(ValueError):
+    """Relaciona uma falha de cadastro ao campo que precisa ser corrigido."""
+
+    def __init__(self, campo, mensagem):
+        super().__init__(mensagem)
+        self.campo = campo
+
+
+def rascunho_cliente_formulario(formulario):
+    """Mantem os valores digitados no cadastro de cliente quando houver erro."""
+    placas = formulario.getlist('placa_veiculo')
+    modelos = formulario.getlist('modelo_veiculo')
+    anos = formulario.getlist('ano_veiculo')
+    total_veiculos = max(len(placas), len(modelos), len(anos), 1)
+    veiculos = []
+    for indice in range(total_veiculos):
+        veiculos.append({
+            'placa': placas[indice] if indice < len(placas) else '',
+            'modelo': modelos[indice] if indice < len(modelos) else '',
+            'ano': anos[indice] if indice < len(anos) else date.today().year,
+        })
+    return {
+        'cnpj': formulario.get('cnpj', ''),
+        'razao_social': formulario.get('razao_social', ''),
+        'telefone': formulario.get('telefone', ''),
+        'email': formulario.get('email', ''),
+        'cep': formulario.get('cep', ''),
+        'numero': formulario.get('numero', ''),
+        'complemento': formulario.get('complemento', ''),
+        'veiculos': veiculos,
+    }
+
+
 def validar_dados_cliente(cnpj, dados, veiculos, cep=None):
     """Valida limites do DER antes de iniciar o cadastro administrativo."""
     razao_social, telefone, email = dados
     if len(cnpj) != 14:
-        raise ValueError('Informe um CNPJ com 14 dígitos.')
+        raise ErroValidacaoCliente('cnpj', 'Informe um CNPJ com 14 dígitos.')
     if not razao_social:
-        raise ValueError('Informe a razão social do cliente.')
+        raise ErroValidacaoCliente('razao_social', 'Informe a razão social do cliente.')
     if len(razao_social) > 30:
-        raise ValueError('A razão social deve ter no máximo 30 caracteres.')
+        raise ErroValidacaoCliente('razao_social', 'A razão social deve ter no máximo 30 caracteres.')
     if len(telefone) > 11:
-        raise ValueError('O telefone deve ter no máximo 11 dígitos.')
+        raise ErroValidacaoCliente('telefone', 'O telefone deve ter no máximo 11 dígitos.')
+    if email and not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', email):
+        raise ErroValidacaoCliente('email', 'Informe um e-mail válido, como nome@empresa.com.')
     if len(email) > 30:
-        raise ValueError('O e-mail deve ter no máximo 30 caracteres.')
+        raise ErroValidacaoCliente('email', 'O e-mail deve ter no máximo 30 caracteres.')
     if not veiculos:
-        raise ValueError('Informe pelo menos uma placa para o cliente.')
+        raise ErroValidacaoCliente('veiculos', 'Informe pelo menos uma placa para o cliente.')
     for veiculo in veiculos:
         if len(veiculo['placa']) != 7:
-            raise ValueError('Cada placa deve possuir 7 caracteres.')
+            raise ErroValidacaoCliente('veiculos', 'Cada placa deve possuir 7 caracteres.')
         if len(veiculo['modelo']) > 28:
-            raise ValueError('O modelo do veículo deve ter no máximo 28 caracteres.')
+            raise ErroValidacaoCliente('veiculos', 'O modelo do veículo deve ter no máximo 28 caracteres.')
     if cep is not None:
         if len(cep) != 8:
-            raise ValueError('Informe um CEP com 8 dígitos.')
+            raise ErroValidacaoCliente('cep', 'Informe um CEP com 8 dígitos.')
 
 
 def garantir_endereco_cliente(cep):
@@ -1406,6 +1441,8 @@ def dashboard_admin():
     """Painel administrativo para clientes, servicos, boletos e relatorios."""
     mensagem = ''
     erro = ''
+    erros_cliente = {}
+    novo_cliente = None
     painel_ativo = request.args.get('painel', 'dashboard')
 
     if request.method == 'POST':
@@ -1452,6 +1489,8 @@ def dashboard_admin():
                 # Cria ou atualiza cliente e sincroniza seus veiculos.
                 cnpj = somente_digitos(request.form.get('cnpj'))
                 cnpj_original = somente_digitos(request.form.get('cnpj_original'))
+                if not cnpj_original:
+                    novo_cliente = rascunho_cliente_formulario(request.form)
                 dados = (
                     request.form.get('razao_social', '').strip(),
                     somente_digitos(request.form.get('telefone')),
@@ -1494,6 +1533,7 @@ def dashboard_admin():
                     if login_criado:
                         mensagem += f' Login inicial: {cnpj} | Senha: Cliente@123'
                     logger_auditoria.info(f'Admin criou cliente {mascarar_cnpj(cnpj)}')
+                    novo_cliente = None
 
             elif acao == 'excluir_cliente':
                 # Exclui o cliente pelo CNPJ informado no formulario.
@@ -1529,6 +1569,8 @@ def dashboard_admin():
 
         except ValueError as exc:
             erro = str(exc)
+            if isinstance(exc, ErroValidacaoCliente) and novo_cliente is not None:
+                erros_cliente[exc.campo] = str(exc)
         except Exception as exc:
             erro = 'Não foi possível concluir a operação. Verifique se há registros vinculados.'
             logger_erro.exception(f'Erro admin: {exc}')
@@ -1650,6 +1692,8 @@ def dashboard_admin():
         painel_ativo=painel_ativo,
         mensagem=mensagem,
         erro=erro,
+        novo_cliente=novo_cliente or {},
+        erros_cliente=erros_cliente,
     )
 
 

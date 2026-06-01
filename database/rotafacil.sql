@@ -1,83 +1,111 @@
 -- ============================================================
 -- BANCO SQLITE AUXILIAR DO SITE
--- Ele cria dados locais usados para login, contato e demonstracao.
 -- ============================================================
+-- Este arquivo e como uma receita: quando o site inicia, o Python le
+-- estes comandos e garante que as tabelas necessarias existem.
+--
+-- SQLite e um banco pequeno salvo em um unico arquivo:
+-- database/rotafacil.db
+--
+-- Ele guarda somente dados auxiliares do site:
+-- 1. mensagens enviadas pelo formulario de contato;
+-- 2. usuarios e senhas usados para entrar no sistema.
+--
+-- Os dados principais da operacao nao ficam aqui. Clientes, veiculos,
+-- servicos realizados, faturas e boletos ficam no banco MySQL rota_facil.
+--
 
--- Mensagens enviadas pelo formulario publico de contato.
+-- ============================================================
+-- TABELA: contatos
+-- ============================================================
+-- Guarda as mensagens enviadas pela pagina publica de contato.
+-- Pense nela como uma caixa de entrada: cada envio vira uma nova linha.
 CREATE TABLE IF NOT EXISTS contatos (
+    -- Identificador interno da mensagem.
+    -- PRIMARY KEY: transforma esta coluna na identificacao principal da linha.
+    -- AUTOINCREMENT: o SQLite escolhe automaticamente o proximo numero.
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- Nome digitado pela pessoa no formulario.
     nome TEXT NOT NULL,
+
+    -- E-mail informado para que a equipe possa responder.
     email TEXT NOT NULL,
+
+    -- Telefone opcional. Como nao possui NOT NULL, pode ficar vazio.
     telefone TEXT,
+
+    -- Tema escolhido ou digitado no formulario.
     assunto TEXT NOT NULL,
+
+    -- Texto principal enviado pela pessoa.
     mensagem TEXT NOT NULL,
+
+    -- Data e horario em que a mensagem foi salva.
+    -- CURRENT_TIMESTAMP preenche automaticamente o momento atual.
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Contas que podem entrar no site como cliente, funcionario ou admin.
+
+-- ============================================================
+-- TABELA: usuarios
+-- ============================================================
+-- Guarda as contas que podem entrar no site.
+-- Cada usuario possui um perfil: cliente, funcionario ou administrador.
 CREATE TABLE IF NOT EXISTS usuarios (
+    -- Identificador interno da conta, criado automaticamente.
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- Nome da pessoa ou da empresa dona da conta.
     nome TEXT NOT NULL,
+
+    -- E-mail da conta.
+    -- UNIQUE impede que duas contas usem o mesmo e-mail.
+    -- Ele e opcional porque nao possui NOT NULL.
     email TEXT UNIQUE,
+
+    -- Documento usado para identificar a conta.
+    -- Para um cliente, normalmente recebe o CNPJ da empresa.
+    -- UNIQUE impede que o mesmo documento seja cadastrado duas vezes.
     documento TEXT UNIQUE,
+
+    -- Senha usada para entrar no sistema.
+    -- O app.py converte senhas antigas para um formato protegido (hash).
     senha TEXT NOT NULL,
+
+    -- Perfil da conta.
+    -- CHECK permite somente os tres valores listados abaixo.
+    -- Isso evita salvar um tipo desconhecido por engano.
     tipo TEXT NOT NULL CHECK (tipo IN ('cliente', 'funcionario', 'admin')),
+
+    -- Controla se a conta pode entrar no sistema.
+    -- No SQLite, 1 representa ativo e 0 representa desativado.
+    -- DEFAULT 1 faz uma conta nova comecar ativa automaticamente.
     ativo INTEGER NOT NULL DEFAULT 1,
+
+    -- Data e horario em que a conta foi cadastrada.
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Estrutura local antiga mantida para compatibilidade com a demonstracao.
--- Os clientes operacionais atuais ficam no MySQL rota_facil.
-CREATE TABLE IF NOT EXISTS clientes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id INTEGER,
-    cnpj TEXT UNIQUE NOT NULL,
-    razao_social TEXT NOT NULL,
-    telefone TEXT,
-    email TEXT,
-    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-);
 
--- Catalogo local antigo mantido para compatibilidade.
--- Os precos atuais exibidos pelo sistema sao lidos do MySQL.
-CREATE TABLE IF NOT EXISTS servicos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    descricao TEXT,
-    valor_base REAL NOT NULL DEFAULT 0,
-    ativo INTEGER NOT NULL DEFAULT 1
-);
-
--- Boletos locais antigos de demonstracao.
--- Os boletos operacionais atuais tambem sao lidos do MySQL.
-CREATE TABLE IF NOT EXISTS boletos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cliente_id INTEGER NOT NULL,
-    descricao TEXT NOT NULL,
-    valor REAL NOT NULL,
-    vencimento DATE NOT NULL,
-    status TEXT NOT NULL DEFAULT 'em_aberto' CHECK (status IN ('em_aberto', 'pago', 'atrasado')),
-    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-);
-
--- Registros iniciais criados apenas se ainda nao existirem.
+-- ============================================================
+-- USUARIOS INICIAIS PARA DESENVOLVIMENTO
+-- ============================================================
+-- Estes registros facilitam os testes locais logo apos criar o banco.
+--
+-- INSERT adiciona linhas na tabela usuarios.
+-- OR IGNORE evita um erro caso um registro igual ja exista.
+-- Por exemplo: ao reiniciar o site, o SQLite nao tenta duplicar o admin.
+--
+-- Cada documento precisa ser diferente porque a coluna documento e UNIQUE.
+-- Estas senhas sao apenas iniciais para o ambiente local de desenvolvimento.
 INSERT OR IGNORE INTO usuarios (id, nome, email, documento, senha, tipo) VALUES
-    (1, 'Administrador', 'admin@novarota.local', '00000000000000', 'admin123', 'admin'),
-    (2, 'João Silva', 'funcionario@novarota.local', '11111111111111', 'func123', 'funcionario'),
+    -- Conta com acesso administrativo.
+    (1, 'Administrador', 'admin@novarota.local', '99999999999999', 'admin123', 'admin'),
+
+    -- Conta usada para testar o painel de funcionario.
+    (2, 'Joao Silva', 'funcionario@novarota.local', '11111111111111', 'func123', 'funcionario'),
+
+    -- Conta usada para testar o painel de cliente.
+    -- O documento deve corresponder a um CNPJ cadastrado no MySQL.
     (3, 'Empresa Exemplo Ltda', 'cliente@novarota.local', '00000000000000', 'cliente123', 'cliente');
-
-INSERT OR IGNORE INTO clientes (id, usuario_id, cnpj, razao_social, telefone, email) VALUES
-    (1, 3, '00.000.000/0000-00', 'Empresa Exemplo Ltda', '(00) 00000-0000', 'cliente@novarota.local');
-
-INSERT OR IGNORE INTO servicos (id, nome, descricao, valor_base) VALUES
-    (1, 'Combustível', 'Abastecimento com qualidade e segurança.', 0),
-    (2, 'Lavagem', 'Lavagem simples e completa para seu veículo.', 80),
-    (3, 'Estacionamento Rotativo', 'Mais praticidade e controle para o seu dia.', 15),
-    (4, 'Estacionamento Mensal', 'Soluções completas para empresas e frotas.', 250);
-
-INSERT OR IGNORE INTO boletos (id, cliente_id, descricao, valor, vencimento, status) VALUES
-    (1, 1, 'Serviços - Outubro/2026', 1250.00, '2026-11-20', 'em_aberto'),
-    (2, 1, 'Serviços - Setembro/2026', 960.00, '2026-10-20', 'pago'),
-    (3, 1, 'Serviços - Agosto/2026', 1100.00, '2026-09-20', 'pago');

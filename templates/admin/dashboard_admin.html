@@ -138,13 +138,30 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="painel" value="clientes">
                         <input type="hidden" name="acao" value="salvar_cliente">
-                        <label><span>Novo CNPJ</span><input name="cnpj" placeholder="00000000000000" required></label>
-                        <label><span>Razão social</span><input name="razao_social" required></label>
-                        <label><span>Telefone</span><input name="telefone"></label>
-                        <label><span>E-mail</span><input name="email"></label>
+                        <label>
+                            <span>Novo CNPJ</span>
+                            <input name="cnpj" value="{{ novo_cliente.cnpj or '' }}" placeholder="00000000000000" required aria-invalid="{{ 'true' if erros_cliente.cnpj else 'false' }}">
+                            {% if erros_cliente.cnpj %}<small class="field-error">{{ erros_cliente.cnpj }}</small>{% endif %}
+                        </label>
+                        <label>
+                            <span>Razão social</span>
+                            <input name="razao_social" value="{{ novo_cliente.razao_social or '' }}" required aria-invalid="{{ 'true' if erros_cliente.razao_social else 'false' }}">
+                            {% if erros_cliente.razao_social %}<small class="field-error">{{ erros_cliente.razao_social }}</small>{% endif %}
+                        </label>
+                        <label>
+                            <span>Telefone</span>
+                            <input name="telefone" value="{{ novo_cliente.telefone or '' }}" aria-invalid="{{ 'true' if erros_cliente.telefone else 'false' }}">
+                            {% if erros_cliente.telefone %}<small class="field-error">{{ erros_cliente.telefone }}</small>{% endif %}
+                        </label>
+                        <label>
+                            <span>E-mail</span>
+                            <input type="email" name="email" value="{{ novo_cliente.email or '' }}" placeholder="nome@empresa.com" aria-invalid="{{ 'true' if erros_cliente.email else 'false' }}">
+                            {% if erros_cliente.email %}<small class="field-error">{{ erros_cliente.email }}</small>{% endif %}
+                        </label>
                         <label>
                             <span>CEP</span>
-                            <input name="cep" list="ceps-existentes" placeholder="Digite o CEP" required>
+                            <input name="cep" value="{{ novo_cliente.cep or '' }}" list="ceps-existentes" placeholder="Digite o CEP" required aria-invalid="{{ 'true' if erros_cliente.cep else 'false' }}">
+                            {% if erros_cliente.cep %}<small class="field-error">{{ erros_cliente.cep }}</small>{% endif %}
                         </label>
                         <datalist id="ceps-existentes">
                             {% for endereco in enderecos %}
@@ -157,15 +174,18 @@
                                 <span>Veículos do cliente</span>
                                 <button class="btn small-btn" type="button" data-add-vehicle>Adicionar placa</button>
                             </div>
-                            <div class="vehicle-form-row" data-vehicle-row>
-                                <label><span>Placa</span><input name="placa_veiculo" placeholder="ABC1234" maxlength="7" required></label>
-                                <label><span>Modelo</span><input name="modelo_veiculo" placeholder="Caminhão Volvo" required></label>
-                                <label><span>Ano</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ current_year }}" required></label>
-                                <button class="btn danger small-btn" type="button" data-remove-vehicle>Remover</button>
-                            </div>
+                            {% if erros_cliente.veiculos %}<small class="field-error">{{ erros_cliente.veiculos }}</small>{% endif %}
+                            {% for veiculo in novo_cliente.veiculos or [{}] %}
+                                <div class="vehicle-form-row" data-vehicle-row>
+                                    <label><span>Placa</span><input name="placa_veiculo" value="{{ veiculo.placa or '' }}" placeholder="ABC1234" maxlength="7" required></label>
+                                    <label><span>Modelo</span><input name="modelo_veiculo" value="{{ veiculo.modelo or '' }}" placeholder="Caminhão Volvo" required></label>
+                                    <label><span>Ano</span><input name="ano_veiculo" type="number" min="1950" max="2035" value="{{ veiculo.ano or current_year }}" required></label>
+                                    <button class="btn danger small-btn" type="button" data-remove-vehicle>Remover</button>
+                                </div>
+                            {% endfor %}
                         </div>
-                        <label><span>Número</span><input name="numero" type="number"></label>
-                        <label><span>Complemento</span><input name="complemento"></label>
+                        <label><span>Número</span><input name="numero" type="number" value="{{ novo_cliente.numero or '' }}"></label>
+                        <label><span>Complemento</span><input name="complemento" value="{{ novo_cliente.complemento or '' }}"></label>
                         <button class="btn btn-highlight" type="submit">Adicionar cliente</button>
                     </form>
                     <!-- Busca por cliente via GET, preservando a navegacao por URL. -->

@@ -1,5 +1,7 @@
 # Posto Nova Rota - Sistema RotaFacil
 
+Antes são necessario abaixar algumas extensões, no arquivo requirements.txt você consegue abaixar todas de uma vez
+
 Aplicacao web desenvolvida em Flask para apresentar o Posto Nova Rota e gerenciar
 clientes empresariais, veiculos, servicos prestados, faturas e boletos.
 

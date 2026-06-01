@@ -1,4 +1,10 @@
 @echo off
+REM Este arquivo e apenas um atalho para iniciar o site localmente no Windows.
+REM Ele configura a porta 8001 para evitar conflito com uma instancia antiga
+REM que possa estar usando a porta 8000 e depois executa o run_8001.py.
+REM Tambem e possivel iniciar o site manualmente com: python run_8001.py
+REM Este arquivo nao e necessario em um ambiente de producao.
+REM
 REM Vai para a pasta onde este arquivo esta salvo.
 cd /d "%~dp0"
 REM Define as configuracoes da instancia local antes de iniciar o Python.

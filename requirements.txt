@@ -1,11 +1,35 @@
+# Framework web usado para criar rotas, paginas e APIs.
 Flask==2.3.2
+
+# Carrega configuracoes e segredos definidos em arquivos .env.
 python-dotenv==1.0.0
+
+# Driver oficial para conectar a aplicacao ao banco de dados MySQL.
 mysql-connector-python==8.0.33
+
+# Biblioteca ORM para trabalhar com bancos de dados usando classes e consultas Python.
 SQLAlchemy==2.0.19
+
+# Outro driver de conexao com MySQL, compativel com SQLAlchemy.
 pymysql==1.1.0
+
+# Valida se enderecos de e-mail possuem um formato valido.
 email-validator==2.0.0
+
+# Remove HTML potencialmente perigoso de textos enviados por usuarios.
 bleach==6.0.0
+
+# Conjunto de utilitarios usado pelo Flask, incluindo recursos de seguranca e HTTP.
 werkzeug==2.3.6
+
+# Protege formularios Flask contra ataques CSRF e facilita a validacao dos campos.
 Flask-WTF==1.1.1
+
+# Limita a quantidade de requisicoes recebidas para reduzir abusos.
 Flask-Limiter==3.3.1
+
+# Servidor HTTP usado para executar aplicacoes Python em ambientes de producao.
 gunicorn==21.2.0
+
+#Caso queira abaixar todas as extensões de uma fez, usar o comando:
+#pip install -r requirements.txt

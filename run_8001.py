@@ -1,5 +1,7 @@
-# Importa a aplicacao Flask preparada no arquivo principal.
+#Cria um mini servdor local para rodar a aplicacao Flask, usando o arquivo app.py como base.
+
 from app import app
+# Importa a aplicacao Flask preparada no arquivo principal.
 
 
 # Este bloco so e executado quando iniciamos este arquivo diretamente.

@@ -2364,6 +2364,12 @@ a.service-card:hover img {
     font-weight: 800;
 }
 
+.dashboard-form .field-error {
+    color: #b42318;
+    font-size: 13px;
+    font-weight: 800;
+}
+
 .dashboard-form input,
 .dashboard-form select,
 .dashboard-form textarea {
@@ -2375,6 +2381,11 @@ a.service-card:hover img {
     background: #f8fbff;
     color: var(--ink);
     font: inherit;
+}
+
+.dashboard-form input[aria-invalid="true"] {
+    border-color: #d92d20;
+    background: #fff7f6;
 }
 
 .dashboard-form textarea {
