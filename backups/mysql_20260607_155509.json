@@ -1,0 +1,1007 @@
+{
+  "boleto": [
+    {
+      "id_Boleto": 1,
+      "data_vencimento": "2025-05-30",
+      "data_emissao": "2025-05-01",
+      "codigo_barras": "12345678901234567890123456789012345678901234",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 1
+    },
+    {
+      "id_Boleto": 3,
+      "data_vencimento": "2025-07-10",
+      "data_emissao": "2025-07-01",
+      "codigo_barras": "32345678901234567890123456789012345678901234",
+      "status_pagamento": "ATRASADO",
+      "Fatura_id_Fatura": 3
+    },
+    {
+      "id_Boleto": 4,
+      "data_vencimento": "2025-08-05",
+      "data_emissao": "2025-07-20",
+      "codigo_barras": "42345678901234567890123456789012345678901234",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 4
+    },
+    {
+      "id_Boleto": 5,
+      "data_vencimento": "2025-08-15",
+      "data_emissao": "2025-07-25",
+      "codigo_barras": "52345678901234567890123456789012345678901234",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 5
+    },
+    {
+      "id_Boleto": 6,
+      "data_vencimento": "2025-09-01",
+      "data_emissao": "2025-08-10",
+      "codigo_barras": "62345678901234567890123456789012345678901234",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 6
+    },
+    {
+      "id_Boleto": 8,
+      "data_vencimento": "2025-09-20",
+      "data_emissao": "2025-08-30",
+      "codigo_barras": "82345678901234567890123456789012345678901234",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 8
+    },
+    {
+      "id_Boleto": 9,
+      "data_vencimento": "2025-10-05",
+      "data_emissao": "2025-09-15",
+      "codigo_barras": "92345678901234567890123456789012345678901234",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 9
+    },
+    {
+      "id_Boleto": 10,
+      "data_vencimento": "2025-10-15",
+      "data_emissao": "2025-09-25",
+      "codigo_barras": "1034567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 10
+    },
+    {
+      "id_Boleto": 11,
+      "data_vencimento": "2025-11-01",
+      "data_emissao": "2025-10-10",
+      "codigo_barras": "1134567890123456789012345678901234567890123",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 11
+    },
+    {
+      "id_Boleto": 12,
+      "data_vencimento": "2025-11-10",
+      "data_emissao": "2025-10-20",
+      "codigo_barras": "1234567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 12
+    },
+    {
+      "id_Boleto": 13,
+      "data_vencimento": "2025-11-20",
+      "data_emissao": "2025-10-30",
+      "codigo_barras": "1334567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 13
+    },
+    {
+      "id_Boleto": 14,
+      "data_vencimento": "2025-12-05",
+      "data_emissao": "2025-11-15",
+      "codigo_barras": "1434567890123456789012345678901234567890123",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 14
+    },
+    {
+      "id_Boleto": 15,
+      "data_vencimento": "2025-12-15",
+      "data_emissao": "2025-11-25",
+      "codigo_barras": "1534567890123456789012345678901234567890123",
+      "status_pagamento": "ATRASADO",
+      "Fatura_id_Fatura": 15
+    },
+    {
+      "id_Boleto": 16,
+      "data_vencimento": "2026-01-05",
+      "data_emissao": "2025-12-20",
+      "codigo_barras": "1634567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 16
+    },
+    {
+      "id_Boleto": 17,
+      "data_vencimento": "2026-01-15",
+      "data_emissao": "2025-12-25",
+      "codigo_barras": "1734567890123456789012345678901234567890123",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 17
+    },
+    {
+      "id_Boleto": 18,
+      "data_vencimento": "2026-02-01",
+      "data_emissao": "2026-01-10",
+      "codigo_barras": "1834567890123456789012345678901234567890123",
+      "status_pagamento": "ATRASADO",
+      "Fatura_id_Fatura": 18
+    },
+    {
+      "id_Boleto": 19,
+      "data_vencimento": "2026-02-10",
+      "data_emissao": "2026-01-20",
+      "codigo_barras": "1934567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 19
+    },
+    {
+      "id_Boleto": 20,
+      "data_vencimento": "2026-06-20",
+      "data_emissao": "2026-05-30",
+      "codigo_barras": "2034567890123456789012345678901234567890123",
+      "status_pagamento": "PAGO",
+      "Fatura_id_Fatura": 20
+    },
+    {
+      "id_Boleto": 21,
+      "data_vencimento": "2026-06-09",
+      "data_emissao": "2026-05-30",
+      "codigo_barras": "23790202605300000000000000000000000000000021",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 21
+    },
+    {
+      "id_Boleto": 22,
+      "data_vencimento": "2026-06-11",
+      "data_emissao": "2026-06-01",
+      "codigo_barras": "23790202606010000000000000000000000000000022",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 22
+    },
+    {
+      "id_Boleto": 23,
+      "data_vencimento": "2026-06-11",
+      "data_emissao": "2026-06-01",
+      "codigo_barras": "23790202606010000000000000000000000000000023",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 23
+    },
+    {
+      "id_Boleto": 24,
+      "data_vencimento": "2026-06-11",
+      "data_emissao": "2026-06-01",
+      "codigo_barras": "23790202606010000000000000000000000000000024",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 24
+    },
+    {
+      "id_Boleto": 25,
+      "data_vencimento": "2026-06-11",
+      "data_emissao": "2026-06-01",
+      "codigo_barras": "23790202606010000000000000000000000000000025",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 25
+    },
+    {
+      "id_Boleto": 26,
+      "data_vencimento": "2026-06-14",
+      "data_emissao": "2026-06-04",
+      "codigo_barras": "23790202606040000000000000000000000000000026",
+      "status_pagamento": "EM ABERTO",
+      "Fatura_id_Fatura": 26
+    }
+  ],
+  "cliente": [
+    {
+      "cnpj": "10111213000100",
+      "razao_social": "Itália Cargo Ltda",
+      "telefone": "41988887766",
+      "email": "italia@cargo.com",
+      "complemento": "Sala 6",
+      "numero": 1300,
+      "Endereço_cep": "86800000"
+    },
+    {
+      "cnpj": "11121314000199",
+      "razao_social": "Alemanha Transportes SA",
+      "telefone": "41977776655",
+      "email": "alemanha@transportes.com",
+      "complemento": "Galpão 7",
+      "numero": 1400,
+      "Endereço_cep": "86900000"
+    },
+    {
+      "cnpj": "11223344000199",
+      "razao_social": "Expresso Londrina LTDA",
+      "telefone": "43988887777",
+      "email": "expresso@londrina.com",
+      "complemento": "Galpão 1",
+      "numero": 400,
+      "Endereço_cep": "87010000"
+    },
+    {
+      "cnpj": "11444777000161",
+      "razao_social": "Transportadora Horizonte Ltda",
+      "telefone": "11999990000",
+      "email": "financeiro@transportadora.com",
+      "complemento": "Escritório 3",
+      "numero": 456,
+      "Endereço_cep": "65873048"
+    },
+    {
+      "cnpj": "12131415000188",
+      "razao_social": "Japão Logística Ltda",
+      "telefone": "41966665544",
+      "email": "japao@logistica.com",
+      "complemento": "Bloco E",
+      "numero": 1500,
+      "Endereço_cep": "86300000"
+    },
+    {
+      "cnpj": "12345678000195",
+      "razao_social": "Transportes Curitiba LTDA",
+      "telefone": "41987654321",
+      "email": "contato@transportes.com",
+      "complemento": "Sala 2",
+      "numero": 101,
+      "Endereço_cep": "80010000"
+    },
+    {
+      "cnpj": "13141516000177",
+      "razao_social": "Coreia Distribuidora SA",
+      "telefone": "41955554433",
+      "email": "coreia@distribuidora.com",
+      "complemento": "Andar 5",
+      "numero": 1600,
+      "Endereço_cep": "86400000"
+    },
+    {
+      "cnpj": "14151617000166",
+      "razao_social": "França Cargo Ltda",
+      "telefone": "41944443322",
+      "email": "franca@cargo.com",
+      "complemento": "Sala 8",
+      "numero": 1700,
+      "Endereço_cep": "86500000"
+    },
+    {
+      "cnpj": "15161718000155",
+      "razao_social": "Inglaterra Transp. SA",
+      "telefone": "41933332211",
+      "email": "inglaterra@transportes.com",
+      "complemento": "Galpão 10",
+      "numero": 1800,
+      "Endereço_cep": "86600000"
+    },
+    {
+      "cnpj": "16171819000144",
+      "razao_social": "Espanha Logística Ltda",
+      "telefone": "41922221100",
+      "email": "espanha@logistica.com",
+      "complemento": "Bloco F",
+      "numero": 1900,
+      "Endereço_cep": "86700000"
+    },
+    {
+      "cnpj": "17181920000133",
+      "razao_social": "Portugal Distribuidora",
+      "telefone": "41911110099",
+      "email": "portugal@distribuidora.com",
+      "complemento": "Andar 6",
+      "numero": 2000,
+      "Endereço_cep": "86850000"
+    },
+    {
+      "cnpj": "22334455000188",
+      "razao_social": "Maringá Transportes SA",
+      "telefone": "44977776666",
+      "email": "contato@maringatransp.com",
+      "complemento": "Sala 5",
+      "numero": 500,
+      "Endereço_cep": "85800000"
+    },
+    {
+      "cnpj": "33445566000177",
+      "razao_social": "Tamandaré Logística Ltda",
+      "telefone": "41966665555",
+      "email": "logistica@tamandare.com",
+      "complemento": "Bloco C",
+      "numero": 600,
+      "Endereço_cep": "84010000"
+    },
+    {
+      "cnpj": "44556677000166",
+      "razao_social": "Visconde Distribuidora SA",
+      "telefone": "41955554444",
+      "email": "visconde@distribuidora.com",
+      "complemento": "Andar 2",
+      "numero": 700,
+      "Endereço_cep": "85850000"
+    },
+    {
+      "cnpj": "45678912000177",
+      "razao_social": "Distribuidora Sul Ltda",
+      "telefone": "41955554444",
+      "email": "financeiro@distsul.com",
+      "complemento": "Andar 3",
+      "numero": 303,
+      "Endereço_cep": "86010000"
+    },
+    {
+      "cnpj": "50444555000140",
+      "razao_social": "Litoral Cargas Express Ltda",
+      "telefone": "48954321098",
+      "email": "contato@litoralcargas.com",
+      "complemento": "Casa 9",
+      "numero": 879,
+      "Endereço_cep": "88700004"
+    },
+    {
+      "cnpj": "55667788000155",
+      "razao_social": "Mateus Transportes Ltda",
+      "telefone": "41944443333",
+      "email": "mateus@transportes.com",
+      "complemento": "Depósito 3",
+      "numero": 800,
+      "Endereço_cep": "83005000"
+    },
+    {
+      "cnpj": "66778899000144",
+      "razao_social": "Chile Cargo Ltda",
+      "telefone": "41933332222",
+      "email": "chile@cargo.com",
+      "complemento": "Galpão 9",
+      "numero": 900,
+      "Endereço_cep": "83200000"
+    },
+    {
+      "cnpj": "77889900000133",
+      "razao_social": "México Logística SA",
+      "telefone": "41922221111",
+      "email": "mexico@logistica.com",
+      "complemento": "Sala 10",
+      "numero": 1000,
+      "Endereço_cep": "85000000"
+    },
+    {
+      "cnpj": "88990011000122",
+      "razao_social": "Estados Unidos Transp.",
+      "telefone": "41911110000",
+      "email": "usa@transportes.com",
+      "complemento": "Bloco D",
+      "numero": 1100,
+      "Endereço_cep": "85600000"
+    },
+    {
+      "cnpj": "99001122000111",
+      "razao_social": "Canadá Distribuidora SA",
+      "telefone": "41999998888",
+      "email": "canada@distribuidora.com",
+      "complemento": "Andar 4",
+      "numero": 1200,
+      "Endereço_cep": "85500000"
+    }
+  ],
+  "endereço": [
+    {
+      "cep": "65873048",
+      "logradouro": "Avenida Republica",
+      "cidade": "Curitiba",
+      "uf": "PR"
+    },
+    {
+      "cep": "80010000",
+      "logradouro": "Rua XV de Novembro",
+      "cidade": "Curitiba",
+      "uf": "PR"
+    },
+    {
+      "cep": "80020000",
+      "logradouro": "Avenida Sete de Setembro",
+      "cidade": "Curitiba",
+      "uf": "PR"
+    },
+    {
+      "cep": "83005000",
+      "logradouro": "Rua XV de Novembro",
+      "cidade": "São José dos Pinhais",
+      "uf": "PR"
+    },
+    {
+      "cep": "83200000",
+      "logradouro": "Rua da Praia",
+      "cidade": "Paranaguá",
+      "uf": "PR"
+    },
+    {
+      "cep": "84010000",
+      "logradouro": "Rua Balduíno Taques",
+      "cidade": "Ponta Grossa",
+      "uf": "PR"
+    },
+    {
+      "cep": "85000000",
+      "logradouro": "Rua das Palmeiras",
+      "cidade": "Guarapuava",
+      "uf": "PR"
+    },
+    {
+      "cep": "85500000",
+      "logradouro": "Avenida Tupi",
+      "cidade": "Pato Branco",
+      "uf": "PR"
+    },
+    {
+      "cep": "85600000",
+      "logradouro": "Rua Central",
+      "cidade": "Francisco Beltrão",
+      "uf": "PR"
+    },
+    {
+      "cep": "85800000",
+      "logradouro": "Rua Paraná",
+      "cidade": "Cascavel",
+      "uf": "PR"
+    },
+    {
+      "cep": "85850000",
+      "logradouro": "Avenida Brasil",
+      "cidade": "Foz do Iguaçu",
+      "uf": "PR"
+    },
+    {
+      "cep": "86010000",
+      "logradouro": "Avenida Higienópolis",
+      "cidade": "Londrina",
+      "uf": "PR"
+    },
+    {
+      "cep": "86300000",
+      "logradouro": "Rua Goiás",
+      "cidade": "Rolândia",
+      "uf": "PR"
+    },
+    {
+      "cep": "86400000",
+      "logradouro": "Rua Paraná",
+      "cidade": "Cambé",
+      "uf": "PR"
+    },
+    {
+      "cep": "86500000",
+      "logradouro": "Rua do Comércio",
+      "cidade": "Ibiporã",
+      "uf": "PR"
+    },
+    {
+      "cep": "86600000",
+      "logradouro": "Avenida Norte",
+      "cidade": "Jandaia do Sul",
+      "uf": "PR"
+    },
+    {
+      "cep": "86700000",
+      "logradouro": "Rua Sul",
+      "cidade": "Sarandi",
+      "uf": "PR"
+    },
+    {
+      "cep": "86800000",
+      "logradouro": "Rua Principal",
+      "cidade": "Apucarana",
+      "uf": "PR"
+    },
+    {
+      "cep": "86850000",
+      "logradouro": "Rua Leste",
+      "cidade": "Campo Mourão",
+      "uf": "PR"
+    },
+    {
+      "cep": "86900000",
+      "logradouro": "Rua das Flores",
+      "cidade": "Arapongas",
+      "uf": "PR"
+    },
+    {
+      "cep": "87010000",
+      "logradouro": "Avenida Brasil",
+      "cidade": "Maringá",
+      "uf": "PR"
+    },
+    {
+      "cep": "88700004",
+      "logradouro": null,
+      "cidade": "PENDENTE",
+      "uf": "--"
+    }
+  ],
+  "fatura": [
+    {
+      "id_Fatura": 1,
+      "cliente_cnpj": "12345678000195",
+      "serviço_id_Serviço": 1
+    },
+    {
+      "id_Fatura": 3,
+      "cliente_cnpj": "45678912000177",
+      "serviço_id_Serviço": 3
+    },
+    {
+      "id_Fatura": 4,
+      "cliente_cnpj": "11223344000199",
+      "serviço_id_Serviço": 4
+    },
+    {
+      "id_Fatura": 5,
+      "cliente_cnpj": "22334455000188",
+      "serviço_id_Serviço": 5
+    },
+    {
+      "id_Fatura": 6,
+      "cliente_cnpj": "33445566000177",
+      "serviço_id_Serviço": 6
+    },
+    {
+      "id_Fatura": 7,
+      "cliente_cnpj": "44556677000166",
+      "serviço_id_Serviço": 7
+    },
+    {
+      "id_Fatura": 8,
+      "cliente_cnpj": "55667788000155",
+      "serviço_id_Serviço": 8
+    },
+    {
+      "id_Fatura": 9,
+      "cliente_cnpj": "66778899000144",
+      "serviço_id_Serviço": 9
+    },
+    {
+      "id_Fatura": 10,
+      "cliente_cnpj": "77889900000133",
+      "serviço_id_Serviço": 10
+    },
+    {
+      "id_Fatura": 11,
+      "cliente_cnpj": "88990011000122",
+      "serviço_id_Serviço": 11
+    },
+    {
+      "id_Fatura": 12,
+      "cliente_cnpj": "99001122000111",
+      "serviço_id_Serviço": 12
+    },
+    {
+      "id_Fatura": 13,
+      "cliente_cnpj": "10111213000100",
+      "serviço_id_Serviço": 13
+    },
+    {
+      "id_Fatura": 14,
+      "cliente_cnpj": "11121314000199",
+      "serviço_id_Serviço": 14
+    },
+    {
+      "id_Fatura": 15,
+      "cliente_cnpj": "12131415000188",
+      "serviço_id_Serviço": 15
+    },
+    {
+      "id_Fatura": 16,
+      "cliente_cnpj": "13141516000177",
+      "serviço_id_Serviço": 16
+    },
+    {
+      "id_Fatura": 17,
+      "cliente_cnpj": "14151617000166",
+      "serviço_id_Serviço": 17
+    },
+    {
+      "id_Fatura": 18,
+      "cliente_cnpj": "15161718000155",
+      "serviço_id_Serviço": 18
+    },
+    {
+      "id_Fatura": 19,
+      "cliente_cnpj": "16171819000144",
+      "serviço_id_Serviço": 19
+    },
+    {
+      "id_Fatura": 20,
+      "cliente_cnpj": "17181920000133",
+      "serviço_id_Serviço": 20
+    },
+    {
+      "id_Fatura": 21,
+      "cliente_cnpj": "17181920000133",
+      "serviço_id_Serviço": 21
+    },
+    {
+      "id_Fatura": 22,
+      "cliente_cnpj": "13141516000177",
+      "serviço_id_Serviço": 22
+    },
+    {
+      "id_Fatura": 23,
+      "cliente_cnpj": "11444777000161",
+      "serviço_id_Serviço": 23
+    },
+    {
+      "id_Fatura": 24,
+      "cliente_cnpj": "11444777000161",
+      "serviço_id_Serviço": 24
+    },
+    {
+      "id_Fatura": 25,
+      "cliente_cnpj": "66778899000144",
+      "serviço_id_Serviço": 25
+    },
+    {
+      "id_Fatura": 26,
+      "cliente_cnpj": "11444777000161",
+      "serviço_id_Serviço": 26
+    }
+  ],
+  "serviço": [
+    {
+      "id_Serviço": 1,
+      "qunt_utilizada": "50.00",
+      "Veiculo_placa_veiculo": "ABC1234",
+      "data_registro": "2025-05-01",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 3,
+      "qunt_utilizada": "10.00",
+      "Veiculo_placa_veiculo": "LMN4321",
+      "data_registro": "2025-07-01",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 4,
+      "qunt_utilizada": "60.00",
+      "Veiculo_placa_veiculo": "PRC2025",
+      "data_registro": "2025-07-20",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 5,
+      "qunt_utilizada": "2.00",
+      "Veiculo_placa_veiculo": "CWB2020",
+      "data_registro": "2025-07-25",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 6,
+      "qunt_utilizada": "15.00",
+      "Veiculo_placa_veiculo": "TRN3030",
+      "data_registro": "2025-08-10",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 7,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "LOG4040",
+      "data_registro": "2025-08-20",
+      "serviço_utilizado_id_Serviço_utilizado": 4
+    },
+    {
+      "id_Serviço": 8,
+      "qunt_utilizada": "45.00",
+      "Veiculo_placa_veiculo": "DST5050",
+      "data_registro": "2025-08-30",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 9,
+      "qunt_utilizada": "30.00",
+      "Veiculo_placa_veiculo": "CUR1111",
+      "data_registro": "2025-09-15",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 10,
+      "qunt_utilizada": "3.00",
+      "Veiculo_placa_veiculo": "CUR2222",
+      "data_registro": "2025-09-25",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 11,
+      "qunt_utilizada": "20.00",
+      "Veiculo_placa_veiculo": "CUR3333",
+      "data_registro": "2025-10-10",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 12,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "CUR4444",
+      "data_registro": "2025-10-20",
+      "serviço_utilizado_id_Serviço_utilizado": 4
+    },
+    {
+      "id_Serviço": 13,
+      "qunt_utilizada": "55.00",
+      "Veiculo_placa_veiculo": "CUR5555",
+      "data_registro": "2025-10-30",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 14,
+      "qunt_utilizada": "2.00",
+      "Veiculo_placa_veiculo": "CUR6666",
+      "data_registro": "2025-11-15",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 15,
+      "qunt_utilizada": "12.00",
+      "Veiculo_placa_veiculo": "CUR7777",
+      "data_registro": "2025-11-25",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 16,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "CUR8888",
+      "data_registro": "2025-12-20",
+      "serviço_utilizado_id_Serviço_utilizado": 4
+    },
+    {
+      "id_Serviço": 17,
+      "qunt_utilizada": "40.00",
+      "Veiculo_placa_veiculo": "CUR9999",
+      "data_registro": "2025-12-25",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 18,
+      "qunt_utilizada": "4.00",
+      "Veiculo_placa_veiculo": "CWB1111",
+      "data_registro": "2026-01-10",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 19,
+      "qunt_utilizada": "18.00",
+      "Veiculo_placa_veiculo": "CWB2222",
+      "data_registro": "2026-01-20",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 20,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "CWB3333",
+      "data_registro": "2026-01-30",
+      "serviço_utilizado_id_Serviço_utilizado": 4
+    },
+    {
+      "id_Serviço": 21,
+      "qunt_utilizada": "8.00",
+      "Veiculo_placa_veiculo": "CWB3333",
+      "data_registro": "2026-05-30",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 22,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "CUR8888",
+      "data_registro": "2026-06-01",
+      "serviço_utilizado_id_Serviço_utilizado": 3
+    },
+    {
+      "id_Serviço": 23,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "FHR4537",
+      "data_registro": "2026-06-01",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 24,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "FHR4537",
+      "data_registro": "2026-06-01",
+      "serviço_utilizado_id_Serviço_utilizado": 2
+    },
+    {
+      "id_Serviço": 25,
+      "qunt_utilizada": "1.00",
+      "Veiculo_placa_veiculo": "CUR1111",
+      "data_registro": "2026-06-01",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    },
+    {
+      "id_Serviço": 26,
+      "qunt_utilizada": "10.00",
+      "Veiculo_placa_veiculo": "FGE0978",
+      "data_registro": "2026-06-04",
+      "serviço_utilizado_id_Serviço_utilizado": 1
+    }
+  ],
+  "serviço_utilizado": [
+    {
+      "id_Serviço_utilizado": 1,
+      "nome": "Combustível",
+      "descrição": "Abastecimento de veículos",
+      "valor_unitario": "5.49",
+      "desconto": "0.00"
+    },
+    {
+      "id_Serviço_utilizado": 2,
+      "nome": "Lavagem",
+      "descrição": "Lavagem completa de veículos",
+      "valor_unitario": "35.00",
+      "desconto": "5.00"
+    },
+    {
+      "id_Serviço_utilizado": 3,
+      "nome": "Estacionamento Rotativo",
+      "descrição": "Uso por hora",
+      "valor_unitario": "8.00",
+      "desconto": "0.00"
+    },
+    {
+      "id_Serviço_utilizado": 4,
+      "nome": "Estacionamento Mensal",
+      "descrição": "Plano mensal de estacionamento",
+      "valor_unitario": "150.00",
+      "desconto": "10.00"
+    }
+  ],
+  "veiculo": [
+    {
+      "placa_veiculo": "ABC1234",
+      "modelo": "Fiat Fiorino",
+      "Ano_veiculo": 2018,
+      "cliente_cnpj": "12345678000195"
+    },
+    {
+      "placa_veiculo": "CUR1111",
+      "modelo": "Peugeot Partner",
+      "Ano_veiculo": 2018,
+      "cliente_cnpj": "66778899000144"
+    },
+    {
+      "placa_veiculo": "CUR2222",
+      "modelo": "Citroen Jumper",
+      "Ano_veiculo": 2019,
+      "cliente_cnpj": "77889900000133"
+    },
+    {
+      "placa_veiculo": "CUR3333",
+      "modelo": "Toyota Hilux",
+      "Ano_veiculo": 2020,
+      "cliente_cnpj": "88990011000122"
+    },
+    {
+      "placa_veiculo": "CUR4444",
+      "modelo": "Nissan Frontier",
+      "Ano_veiculo": 2021,
+      "cliente_cnpj": "99001122000111"
+    },
+    {
+      "placa_veiculo": "CUR5555",
+      "modelo": "Mitsubishi L200",
+      "Ano_veiculo": 2017,
+      "cliente_cnpj": "10111213000100"
+    },
+    {
+      "placa_veiculo": "CUR6666",
+      "modelo": "Honda Civic",
+      "Ano_veiculo": 2016,
+      "cliente_cnpj": "11121314000199"
+    },
+    {
+      "placa_veiculo": "CUR7777",
+      "modelo": "Chevrolet Onix",
+      "Ano_veiculo": 2022,
+      "cliente_cnpj": "12131415000188"
+    },
+    {
+      "placa_veiculo": "CUR8888",
+      "modelo": "Volkswagen Saveiro",
+      "Ano_veiculo": 2021,
+      "cliente_cnpj": "13141516000177"
+    },
+    {
+      "placa_veiculo": "CUR9999",
+      "modelo": "Fiat Strada",
+      "Ano_veiculo": 2020,
+      "cliente_cnpj": "14151617000166"
+    },
+    {
+      "placa_veiculo": "CWB1111",
+      "modelo": "Ford Ranger",
+      "Ano_veiculo": 2019,
+      "cliente_cnpj": "15161718000155"
+    },
+    {
+      "placa_veiculo": "CWB2020",
+      "modelo": "Hyundai HR",
+      "Ano_veiculo": 2021,
+      "cliente_cnpj": "22334455000188"
+    },
+    {
+      "placa_veiculo": "CWB2222",
+      "modelo": "Jeep Renegade",
+      "Ano_veiculo": 2021,
+      "cliente_cnpj": "16171819000144"
+    },
+    {
+      "placa_veiculo": "CWB3333",
+      "modelo": "Renault Duster",
+      "Ano_veiculo": 2018,
+      "cliente_cnpj": "17181920000133"
+    },
+    {
+      "placa_veiculo": "DFR3567",
+      "modelo": "UNO",
+      "Ano_veiculo": 2008,
+      "cliente_cnpj": "11223344000199"
+    },
+    {
+      "placa_veiculo": "DRE8759",
+      "modelo": "Corsa",
+      "Ano_veiculo": 2009,
+      "cliente_cnpj": "50444555000140"
+    },
+    {
+      "placa_veiculo": "DST5050",
+      "modelo": "Ford Transit",
+      "Ano_veiculo": 2016,
+      "cliente_cnpj": "55667788000155"
+    },
+    {
+      "placa_veiculo": "FGE0978",
+      "modelo": "Caminhão Volvo",
+      "Ano_veiculo": 2017,
+      "cliente_cnpj": "11444777000161"
+    },
+    {
+      "placa_veiculo": "FHR4537",
+      "modelo": "Palio",
+      "Ano_veiculo": 2010,
+      "cliente_cnpj": "11444777000161"
+    },
+    {
+      "placa_veiculo": "GHT3467",
+      "modelo": "Uno",
+      "Ano_veiculo": 2009,
+      "cliente_cnpj": "11121314000199"
+    },
+    {
+      "placa_veiculo": "GRT2067",
+      "modelo": "UNO",
+      "Ano_veiculo": 2008,
+      "cliente_cnpj": "50444555000140"
+    },
+    {
+      "placa_veiculo": "LMN4321",
+      "modelo": "Chevrolet S10",
+      "Ano_veiculo": 2020,
+      "cliente_cnpj": "45678912000177"
+    },
+    {
+      "placa_veiculo": "LOG4040",
+      "modelo": "Iveco Daily",
+      "Ano_veiculo": 2022,
+      "cliente_cnpj": "44556677000166"
+    },
+    {
+      "placa_veiculo": "PRC2025",
+      "modelo": "Renault Kangoo",
+      "Ano_veiculo": 2019,
+      "cliente_cnpj": "11223344000199"
+    },
+    {
+      "placa_veiculo": "TRN3030",
+      "modelo": "Mercedes Sprinter",
+      "Ano_veiculo": 2017,
+      "cliente_cnpj": "33445566000177"
+    }
+  ]
+}

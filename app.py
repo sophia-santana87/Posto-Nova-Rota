@@ -24,7 +24,7 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.conexao import get_connection, init_db, salvar_mensagem_contato
-from database.mysql_conexao import execute_insert_id, execute_query, fetch_all, fetch_one
+from database.mysql_conexao import execute_insert_id, execute_query, fetch_all, fetch_one, get_mysql_connection
 from utils.logger import logger_acesso, logger_auditoria, logger_erro
 
 
@@ -1247,6 +1247,78 @@ def criar_login_cliente(cnpj, razao_social, email):
     return True
 
 
+def excluir_cliente_quitado(cnpj):
+    """Remove um cliente e seus registros operacionais quando todos os boletos estao pagos."""
+    if not cnpj:
+        raise ValueError('Informe o CNPJ do cliente para excluir.')
+
+    conexao = get_mysql_connection()
+    cursor = conexao.cursor(dictionary=True)
+    try:
+        conexao.start_transaction()
+
+        cursor.execute('SELECT cnpj, `Endereço_cep` AS cep FROM cliente WHERE cnpj = %s', (cnpj,))
+        cliente = cursor.fetchone()
+        if not cliente:
+            raise ValueError('Cliente não encontrado.')
+
+        cursor.execute(
+            'SELECT COUNT(*) AS total '
+            'FROM fatura f '
+            'JOIN boleto b ON b.Fatura_id_Fatura = f.id_Fatura '
+            "WHERE f.cliente_cnpj = %s AND UPPER(COALESCE(b.status_pagamento, '')) <> 'PAGO'",
+            (cnpj,),
+        )
+        boletos_nao_pagos = cursor.fetchone()['total']
+        if boletos_nao_pagos:
+            raise ValueError('Não é possível excluir: o cliente possui boleto não pago.')
+
+        cursor.execute(
+            'SELECT `serviço_id_Serviço` AS servico_id FROM fatura WHERE cliente_cnpj = %s',
+            (cnpj,),
+        )
+        servico_ids = [linha['servico_id'] for linha in cursor.fetchall() if linha.get('servico_id')]
+
+        cursor.execute(
+            'DELETE b FROM boleto b '
+            'JOIN fatura f ON f.id_Fatura = b.Fatura_id_Fatura '
+            'WHERE f.cliente_cnpj = %s',
+            (cnpj,),
+        )
+        cursor.execute('DELETE FROM fatura WHERE cliente_cnpj = %s', (cnpj,))
+
+        if servico_ids:
+            placeholders = ', '.join(['%s'] * len(servico_ids))
+            cursor.execute(
+                f'DELETE FROM `serviço` WHERE id_Serviço IN ({placeholders})',
+                tuple(servico_ids),
+            )
+
+        cursor.execute('DELETE FROM veiculo WHERE cliente_cnpj = %s', (cnpj,))
+        cursor.execute('DELETE FROM cliente WHERE cnpj = %s', (cnpj,))
+        if cliente.get('cep'):
+            cursor.execute(
+                'DELETE FROM `endereço` '
+                'WHERE cep = %s '
+                'AND NOT EXISTS (SELECT 1 FROM cliente WHERE `Endereço_cep` = %s)',
+                (cliente['cep'], cliente['cep']),
+            )
+        conexao.commit()
+    except Exception:
+        conexao.rollback()
+        raise
+    finally:
+        cursor.close()
+        conexao.close()
+
+    with get_connection() as conexao_sqlite:
+        conexao_sqlite.execute(
+            "DELETE FROM usuarios WHERE documento = ? AND tipo = 'cliente'",
+            (cnpj,),
+        )
+        conexao_sqlite.commit()
+
+
 @app.route('/')
 def home():
     """Renderiza a pagina inicial publica."""
@@ -1538,7 +1610,7 @@ def dashboard_admin():
             elif acao == 'excluir_cliente':
                 # Exclui o cliente pelo CNPJ informado no formulario.
                 cnpj = somente_digitos(request.form.get('cnpj'))
-                execute_query('DELETE FROM cliente WHERE cnpj=%s', (cnpj,))
+                excluir_cliente_quitado(cnpj)
                 mensagem = 'Cliente excluído com sucesso.'
                 logger_auditoria.info(f'Admin excluiu cliente {mascarar_cnpj(cnpj)}')
 
